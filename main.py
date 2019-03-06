@@ -1,10 +1,9 @@
 import numpy
-
-from envir import upload_data as upld
-
 import pandas as pd
 import warnings
 
+
+from classes import upload_data as upld
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import f1_score
