@@ -37,11 +37,14 @@ import matplotlib.pyplot as plt
 
 
 #
-# train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
+
+#train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
 # test = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
 
-train = pd.read_csv("data/dataset_2/train.csv")
-test = pd.read_csv("data/dataset_2/test.csv")
+train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
+#test = pd.read_csv("data/dataset_2/test.csv", delimiter=None, header='infer', names=None, index_col=None,  )
+
+
 def startTraining(train,train_tweet,train_label):
     # splitting data into training and validation set
     xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42, test_size=0.3)
@@ -65,7 +68,7 @@ def startTraining(train,train_tweet,train_label):
     # tf-idf feature
     # word level tf-idf
     tfidf_vect = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', max_features=5000)
-    tfidf_vect.fit(train['tweet'])
+    tfidf_vect.fit(train[train_tweet])
     xtrain_tfidf =  tfidf_vect.transform(xtrain)
     xvalid_tfidf =  tfidf_vect.transform(xvalid)
 
@@ -108,90 +111,46 @@ def startTraining(train,train_tweet,train_label):
 
 
     SNN = create_model_architecture(xtrain_tfidf.shape[1])
-    models=[MultinomialNB(),SVC(kernel='linear'),LogisticRegression( solver='lbfgs'),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
-    entries=[]
-    for model in models:
-        # nofeatures_accuracy = train_model(model,xtrain,ytrain,xvalid)[0]
+    models=[MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True),SVC(kernel='linear'),LogisticRegression( solver='lbfgs'),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
+    # entries=[]
+    # for model in models:
+    #     # nofeatures_accuracy = train_model(model,xtrain,ytrain,xvalid)[0]
+    #
+    #     # count vectorizer object
+    #     cvo_accuracy = train_model(model,xtrain_count,ytrain,xvalid_count)[0]
+    #
+    #     # bag of words
+    #     bow_accuracy = train_model(model, xtrain_bow, ytrain, xvalid_bow)[0]
+    #     model_name= model.__class__.__name__
+    #
+    #     # TF-IDF
+    #     tfidf_accuracy = train_model(model, xtrain_tfidf, ytrain, xvalid_tfidf)[0]
+    #
+    #     entries.append((model_name,  cvo_accuracy, bow_accuracy,tfidf_accuracy))
+    #
+    # cv_df = pd.DataFrame(entries, columns=['model_name','cvo','bog', 'tfidf_word_lvl'])
+    # print(cv_df)
+    #
+    #
+    snn_accuracy = train_model(SNN, xtrain_tfidf, ytrain, xvalid_tfidf, is_neural_net=True)[0]
+    print(snn_accuracy)
 
-        # count vectorizer object
-        cvo_accuracy = train_model(model,xtrain_count,ytrain,xvalid_count)[0]
-
-        # bag of words
-        bow_accuracy = train_model(model, xtrain_bow, ytrain, xvalid_bow)[0]
-        model_name= model.__class__.__name__
-
-        # TF-IDF
-        tfidf_accuracy = train_model(model, xtrain_tfidf, ytrain, xvalid_tfidf)[0]
-
-        entries.append((model_name,  cvo_accuracy, bow_accuracy,tfidf_accuracy))
-
-    cv_df = pd.DataFrame(entries, columns=['model_name','cvo','bog', 'tfidf_word_lvl'])
-    print(cv_df)
-
-
-    snn_accuracy = train_model(SNN,xtrain_tfidf,ytrain,xvalid_tfidf, is_neural_net=True)[0]
-
-
-    def create_cnn():
-        # Add an Input Layer
-        input_layer = layers.Input((70,))
-
-        # Add the word embedding Layer
-        embedding_layer = layers.Embedding(len(word_index) + 1, 300, weights=[embedding_matrix], trainable=False)(
-            input_layer)
-        embedding_layer = layers.SpatialDropout1D(0.3)(embedding_layer)
-
-        # Add the convolutional Layer
-        conv_layer = layers.Convolution1D(100, 3, activation="relu")(embedding_layer)
-
-        # Add the pooling Layer
-        pooling_layer = layers.GlobalMaxPool1D()(conv_layer)
-
-        # Add the output Layers
-        output_layer1 = layers.Dense(50, activation="relu")(pooling_layer)
-        output_layer1 = layers.Dropout(0.25)(output_layer1)
-        output_layer2 = layers.Dense(1, activation="sigmoid")(output_layer1)
-
-        # Compile the model
-        model = mdl.Model(inputs=input_layer, outputs=output_layer2)
-        model.compile(optimizer=optimizers.Adam(), loss='binary_crossentropy')
-
-        return model
-
-    # load the pre-trained word-embedding vectors
-    embeddings_index = {}
-    for i, line in enumerate(open('data/wiki-news-300d-1M.vec')):
-        values = line.split()
-        embeddings_index[values[0]] = numpy.asarray(values[1:], dtype='float32')
-    # create a tokenizer
-    token = text.Tokenizer()
-    token.fit_on_texts(train[train_tweet])
-    word_index = token.word_index
-    # convert text to sequence of tokens and pad them to ensure equal length vectors
-    train_seq_x = sequence.pad_sequences(token.texts_to_sequences(xtrain), maxlen=70)
-    valid_seq_x = sequence.pad_sequences(token.texts_to_sequences(xvalid), maxlen=70)
-    # create token-embedding mapping
-    embedding_matrix = numpy.zeros((len(word_index) + 1, 300))
-    for word, i in word_index.items():
-        embedding_vector = embeddings_index.get(word)
-        if embedding_vector is not None:
-            embedding_matrix[i] = embedding_vector
-    classifier = create_cnn()
-    accuracy = train_model(classifier, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)[0]
-    print
-    "CNN, Word Embeddings", accuracy
-
-
-#startTraining(train,"tweet","label")
+    mbaccuracy= MultinomialNB()
+#     CV = 2
+#     cv_df = pd.DataFrame(index=range(CV * len(models)))
+#     entries = []
+#     for model in models:
+#         model_name = model.__class__.__name__
+#         accuracies = cross_val_score(model, xtrain_count, ytrain, scoring='accuracy', cv=CV)
+#         for fold_idx, accuracy in enumerate(accuracies):
+#             entries.append((model_name, fold_idx, accuracy))
+#     cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
 #
-# CV = 10
-# cv_df = pd.DataFrame(index=range(CV * len(models)))
-# entries = []
-# for model in models:
-#   model_name = model.__class__.__name__
-#   accuracies = cross_val_score(model, xtrain_count, ytrain, scoring='accuracy', cv=CV)
-#   for fold_idx, accuracy in enumerate(accuracies):
-#     entries.append((model_name, fold_idx, accuracy))
-# cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
+#     print(cv_df.groupby('model_name').accuracy.mean())
 #
-# print(cv_df.groupby('model_name').accuracy.mean())
+#
+# startTraining(train,"tweet","label")
+
+startTraining(train,"SentimentText","Sentiment")
+
+
