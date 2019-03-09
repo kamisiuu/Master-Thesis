@@ -2,7 +2,7 @@ import numpy
 import pandas as pd
 import warnings
 
-
+from classes import sapreprocess as preproc
 from classes import upload_data as upld
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -44,6 +44,9 @@ import matplotlib.pyplot as plt
 train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
 #test = pd.read_csv("data/dataset_2/test.csv", delimiter=None, header='infer', names=None, index_col=None,  )
 
+#preprocessing
+#train = preproc.data_clean(train,"tweet)
+train = preproc.data_clean(train,"SentimentText")
 
 def startTraining(train,train_tweet,train_label):
     # splitting data into training and validation set

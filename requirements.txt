@@ -12,3 +12,4 @@ sklearn
 tensorflow
 keras
 matplotlib
+nltk

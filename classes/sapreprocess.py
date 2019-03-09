@@ -5,7 +5,7 @@ nltk.download('stopwords')
 from nltk.stem.porter import *
 
 tokenized_tweet = []
-def data_clean(train):
+def data_clean(train,train_tweet):
     # this function helps to remove twitter handles , twitter data contain lots of twitter handles like "@username",
     # we remove those signs and usernames, because we dont won't to store peoples information, and at the same time this type of information
     # is not needed for our tests
@@ -18,18 +18,18 @@ def data_clean(train):
 
 
     # remove twitter handles (@user)
-    train['tweet'] = np.vectorize(remove_pattern)(train['tweet'], "@[\w]*")
+    train[train_tweet] = np.vectorize(remove_pattern)(train[train_tweet], "@[\w]*")
     # remove special characters, numbers, punctuations
-    train['tweet'] = train['tweet'].str.replace("[^a-zA-Z#]", " ")
+    train[train_tweet] = train[train_tweet].str.replace("[^a-zA-Z#]", " ")
     # removing short words
-    train['tweet'] = train['tweet'].apply(lambda x: ' '.join([w for w in x.split() if len(w) > 3]))
+    train[train_tweet] = train[train_tweet].apply(lambda x: ' '.join([w for w in x.split() if len(w) > 3]))
     # transforming into lower case
-    train['tweet'] = train['tweet'].apply(lambda x: " ".join(x.lower() for x in x.split()))
+    train[train_tweet] = train[train_tweet].apply(lambda x: " ".join(x.lower() for x in x.split()))
 
     # Removal of stopwords
 
     stop = stopwords.words('english')
-    train['tweet'] = train['tweet'].apply(lambda x: " ".join(x for x in x.split() if x not in stop))
+    train[train_tweet] = train[train_tweet].apply(lambda x: " ".join(x for x in x.split() if x not in stop))
 
     # Common word removal
     # freq = pd.Series(' '.join(combi['tidy_tweet']).split()).value_counts()[:10]
@@ -43,7 +43,7 @@ def data_clean(train):
 
 
     # Tokenization process of building a dictionary and transform document into vectors
-    tokenized_tweet = train['tweet'].apply(lambda x: x.split())
+    tokenized_tweet = train[train_tweet].apply(lambda x: x.split())
 
 
     # Stemming is a rule-based process of stripping the suffixes (“ing”, “ly”, “es”, “s” etc)
@@ -57,7 +57,7 @@ def data_clean(train):
     for i in range(len(tokenized_tweet)):
         tokenized_tweet[i] = ' '.join(tokenized_tweet[i])
 
-    train['tweet'] = tokenized_tweet
+    train[train_tweet] = tokenized_tweet
     return train
 
 
