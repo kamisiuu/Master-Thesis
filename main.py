@@ -2,8 +2,8 @@ import numpy
 import pandas as pd
 import warnings
 
-from classes import sapreprocess as preproc
-from classes import upload_data as upld
+from classes import data_cleaning as preproc
+from classes import data_upload as upld
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import f1_score
@@ -46,9 +46,10 @@ train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
 
 #preprocessing
 #train = preproc.data_clean(train,"tweet)
-train = preproc.data_clean(train,"SentimentText")
+print("not preprocessed",train, "\n")
+train = preproc.clean_data(train,"SentimentText")
 
-def startTraining(train,train_tweet,train_label):
+def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=False):
     # splitting data into training and validation set
     xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42, test_size=0.3)
     # train = pr.data_clean(train)
@@ -111,10 +112,35 @@ def startTraining(train,train_tweet,train_label):
         classifier.compile(optimizer=optimizers.Adam(), loss='binary_crossentropy')
         return classifier
 
+    if multitrain:
+        models = [MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True), SVC(kernel='linear'),
+                  LogisticRegression(solver='lbfgs'), KNeighborsClassifier(), RandomForestClassifier(), XGBClassifier(),
+                  MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
+        entries=[]
+        for model in models:
+            # nofeatures_accuracy = train_model(model,xtrain,ytrain,xvalid)[0]
 
+            # count vectorizer object
+            cvo_accuracy = train_model(model,xtrain_count,ytrain,xvalid_count)[0]
 
-    SNN = create_model_architecture(xtrain_tfidf.shape[1])
-    models=[MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True),SVC(kernel='linear'),LogisticRegression( solver='lbfgs'),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
+            # bag of words
+            bow_accuracy = train_model(model, xtrain_bow, ytrain, xvalid_bow)[0]
+            model_name= model.__class__.__name__
+
+            # TF-IDF
+            tfidf_accuracy = train_model(model, xtrain_tfidf, ytrain, xvalid_tfidf)[0]
+
+            entries.append((model_name,  cvo_accuracy, bow_accuracy,tfidf_accuracy))
+
+        cv_df = pd.DataFrame(entries, columns=['model_name','cvo','bog', 'tfidf_word_lvl'])
+        print(cv_df)
+    else:
+        CV=10
+        nb = MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True)
+        accuracies = cross_val_score(nb, xtrain_count, ytrain, scoring='accuracy', cv=CV)
+        print(accuracies)
+    #SNN = create_model_architecture(xtrain_tfidf.shape[1])
+    #models=[MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True),SVC(kernel='linear'),LogisticRegression( solver='lbfgs'),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
     # entries=[]
     # for model in models:
     #     # nofeatures_accuracy = train_model(model,xtrain,ytrain,xvalid)[0]
@@ -135,10 +161,14 @@ def startTraining(train,train_tweet,train_label):
     # print(cv_df)
     #
     #
-    snn_accuracy = train_model(SNN, xtrain_tfidf, ytrain, xvalid_tfidf, is_neural_net=True)[0]
-    print(snn_accuracy)
+    # snn_accuracy = train_model(SNN, xtrain_tfidf, ytrain, xvalid_tfidf, is_neural_net=True)[0]
+    # print(snn_accuracy)
 
-    mbaccuracy= MultinomialNB()
+    nb= MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True).fit(xtrain_count,ytrain)
+    prediction = nb.predict(xvalid_count)
+    print(f1_score(yvalid, prediction))
+    entries=[]
+    entries.append()
 #     CV = 2
 #     cv_df = pd.DataFrame(index=range(CV * len(models)))
 #     entries = []
@@ -154,6 +184,6 @@ def startTraining(train,train_tweet,train_label):
 #
 # startTraining(train,"tweet","label")
 
-startTraining(train,"SentimentText","Sentiment")
+startTraining(train, "SentimentText", "Sentiment")
 
 

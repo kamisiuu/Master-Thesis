@@ -5,7 +5,7 @@ nltk.download('stopwords')
 from nltk.stem.porter import *
 
 tokenized_tweet = []
-def data_clean(train,train_tweet):
+def clean_data(train,train_tweet):
     # this function helps to remove twitter handles , twitter data contain lots of twitter handles like "@username",
     # we remove those signs and usernames, because we dont won't to store peoples information, and at the same time this type of information
     # is not needed for our tests
@@ -58,6 +58,8 @@ def data_clean(train,train_tweet):
         tokenized_tweet[i] = ' '.join(tokenized_tweet[i])
 
     train[train_tweet] = tokenized_tweet
+    print("\n", "preprocessed text", "\n")
+    print(train)
     return train
 
 
