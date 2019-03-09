@@ -139,6 +139,10 @@ def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=Fa
         nb = MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True)
         accuracies = cross_val_score(nb, xtrain_count, ytrain, scoring='accuracy', cv=CV)
         print(accuracies)
+
+
+
+
     #SNN = create_model_architecture(xtrain_tfidf.shape[1])
     #models=[MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True),SVC(kernel='linear'),LogisticRegression( solver='lbfgs'),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
     # entries=[]
@@ -164,11 +168,11 @@ def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=Fa
     # snn_accuracy = train_model(SNN, xtrain_tfidf, ytrain, xvalid_tfidf, is_neural_net=True)[0]
     # print(snn_accuracy)
 
-    nb= MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True).fit(xtrain_count,ytrain)
-    prediction = nb.predict(xvalid_count)
-    print(f1_score(yvalid, prediction))
-    entries=[]
-    entries.append()
+    # nb= MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True).fit(xtrain_count,ytrain)
+    # prediction = nb.predict(xvalid_count)
+    # print(f1_score(yvalid, prediction))
+    # entries=[]
+    # entries.append()
 #     CV = 2
 #     cv_df = pd.DataFrame(index=range(CV * len(models)))
 #     entries = []
@@ -184,6 +188,6 @@ def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=Fa
 #
 # startTraining(train,"tweet","label")
 
-startTraining(train, "SentimentText", "Sentiment")
+startTraining(train, "SentimentText", "Sentiment",multitrain=True)
 
 
