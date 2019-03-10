@@ -58,8 +58,6 @@ def clean_data(train,train_tweet):
         tokenized_tweet[i] = ' '.join(tokenized_tweet[i])
 
     train[train_tweet] = tokenized_tweet
-    print("\n", "preprocessed text", "\n")
-    print(train)
     return train
 
 

@@ -18,6 +18,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
+from classes import data_exploring as dtexplr
 import matplotlib.pyplot as plt
 # resources:
 # https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html
@@ -46,9 +47,10 @@ train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
 
 #preprocessing
 #train = preproc.data_clean(train,"tweet)
-print("not preprocessed",train, "\n")
-train = preproc.clean_data(train,"SentimentText")
 
+train = preproc.clean_data(train,"SentimentText")
+#dtexplr.explore_non_racist_sexist_tweets(train,"SentimentText","Sentiment")
+dtexplr.explore_hashtags(train,"SentimentText","Sentiment")
 def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=False):
     # splitting data into training and validation set
     xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42, test_size=0.3)
@@ -117,6 +119,7 @@ def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=Fa
                   LogisticRegression(solver='lbfgs'), KNeighborsClassifier(), RandomForestClassifier(), XGBClassifier(),
                   MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
         entries=[]
+
         for model in models:
             # nofeatures_accuracy = train_model(model,xtrain,ytrain,xvalid)[0]
 

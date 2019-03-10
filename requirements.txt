@@ -13,3 +13,5 @@ tensorflow
 keras
 matplotlib
 nltk
+wordcloud
+seaborn
