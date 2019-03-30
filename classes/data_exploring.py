@@ -11,6 +11,10 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 import re
 #  Understanding the common words used in the tweets: WordCloud
+
+def checkfor_missingvalues(train):
+    print (train.isnull().sum())
+
 def explore_common_words(train,train_tweet):
     all_words = ' '.join([text for text in train[train_tweet]])
 

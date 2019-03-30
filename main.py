@@ -24,17 +24,7 @@ import matplotlib.pyplot as plt
 # https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html
 # http://cmdlinetips.com/2018/11/string-manipulations-in-pandas/
 # w3schools.com/python
-
-
-#Origin import, tranforming into csv
-#train = pd.read_csv("../data/training.txt", sep="\t", header=None)
-#test = pd.read_csv("../data/testdata.txt", delim_whitespace=False, delimiter="\n", header=None)
-#train.columns = ["label", "tweet"]
-#test.columns = ["tweet"]
-#df_train = DataFrame(train, columns=train.columns)
-#df_test = DataFrame(test,columns=test.columns)
-#df_train.to_csv('data/train.csv',index=None,header=True)
-#df_test.to_csv('data/test.csv',index=None,header=True)
+# https://www.analyticsvidhya.com/blog/2017/06/word-embeddings-count-word2veec/
 
 
 #
@@ -48,42 +38,53 @@ train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
 #preprocessing
 #train = preproc.data_clean(train,"tweet)
 
-train = preproc.clean_data(train,"SentimentText")
+#train = preproc.clean_data(train,"SentimentText")
 #dtexplr.explore_non_racist_sexist_tweets(train,"SentimentText","Sentiment")
-dtexplr.explore_hashtags(train,"SentimentText","Sentiment")
-def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=False):
-    # splitting data into training and validation set
-    xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42, test_size=0.3)
-    # train = pr.data_clean(train)
+#dtexplr.explore_hashtags(train,"SentimentText","Sentiment")
 
-    # create a count vectorizer object
+
+
+def startTraining(train,train_tweet,train_label, multitrain=False):
+    # splitting data into training and validation set
+    xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42,
+                                                      test_size=0.3)
+    # START OF COUNT VECTORS AS FEATURES
+    # create a count vectorizer object and transform the training and validation data using count vectorizer object
     count_vect = CountVectorizer(analyzer='word', token_pattern=r'\w{1,}')
     count_vect.fit(train[train_tweet])
-
-    # transform the training and validation data using count vectorizer object
     xtrain_count =  count_vect.transform(xtrain)
     xvalid_count =  count_vect.transform(xvalid)
+    # END OF COUNT VECTORS AS FEATURES
 
-    # # Bag og words feature
-    train_bow = CountVectorizer(max_features=1000, lowercase=True, ngram_range=(1,1),analyzer = "word")
-    train_bow.fit(train[train_tweet])
-
-    xtrain_bow = train_bow.transform(xtrain)
-    xvalid_bow = train_bow.transform(xvalid)
-
-    # tf-idf feature
+    # START OF TF-IDF VECTORS AS FEATURES
     # word level tf-idf
     tfidf_vect = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', max_features=5000)
     tfidf_vect.fit(train[train_tweet])
-    xtrain_tfidf =  tfidf_vect.transform(xtrain)
-    xvalid_tfidf =  tfidf_vect.transform(xvalid)
+    xtrain_tfidf = tfidf_vect.transform(xtrain)
+    xvalid_tfidf = tfidf_vect.transform(xvalid)
+    # ngram level tf-idf
+    tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(2, 3), max_features=5000)
+    tfidf_vect_ngram.fit(train[train_tweet])
+    xtrain_tfidf_ngram = tfidf_vect_ngram.transform(xtrain)
+    xvalid_tfidf_ngram = tfidf_vect_ngram.transform(xvalid)
+    # characters level tf-idf
+    tfidf_vect_ngram_chars = TfidfVectorizer(analyzer='char', token_pattern=r'\w{1,}', ngram_range=(2, 3),
+                                             max_features=5000)
+    tfidf_vect_ngram_chars.fit(train[train_tweet])
+    xtrain_tfidf_ngram_chars = tfidf_vect_ngram_chars.transform(xtrain)
+    xvalid_tfidf_ngram_chars = tfidf_vect_ngram_chars.transform(xvalid)
+    # END OF TF-IDF VECTORS AS FEATURES
 
+    # START OF BAG OF WORDS FEATURE
+    train_bow = CountVectorizer(max_features=1000, lowercase=True, ngram_range=(1,1),analyzer = "word")
+    train_bow.fit(train[train_tweet])
+    xtrain_bow = train_bow.transform(xtrain)
+    xvalid_bow = train_bow.transform(xvalid)
+    # END OF BAG OF WORDS FEATURE
 
+    #START OF WORD EMBEDDINGS FEATURE
 
-    # Lets implement these models and understand their details.
-    # The following function is a utility function which can be used to train a model.
-    # It accepts the classifier, feature_vector of training data, labels of training data and
-    # feature vectors of valid data as inputs. Using these inputs, the model is trained and accuracy score is computed.
+    #END OF WORD EMBEDDINGS FEATURE
 
     def train_model(classifier, feature_vector_train, label, feature_vector_valid, is_neural_net=False):
         # fit the training dataset on the classifier
@@ -95,11 +96,9 @@ def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=Fa
         if is_neural_net:
             predictions = predictions.argmax(axis=-1)
 
-        train_model_array=[metrics.accuracy_score(predictions, yvalid),predictions]
-        return train_model_array
+        return metrics.accuracy_score(predictions, yvalid)
 
 
-    #SHALLOW NEURAL NETWORKS
     def create_model_architecture(input_size):
         # create input layer
         input_layer = layers.Input((input_size,), sparse=True)
@@ -114,83 +113,63 @@ def startTraining(train,train_tweet,train_label, gridsearch=False, multitrain=Fa
         classifier.compile(optimizer=optimizers.Adam(), loss='binary_crossentropy')
         return classifier
 
-    if multitrain:
-        models = [MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True), SVC(kernel='linear'),
-                  LogisticRegression(solver='lbfgs'), KNeighborsClassifier(), RandomForestClassifier(), XGBClassifier(),
-                  MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
-        entries=[]
+    def create_cnn():
+        # Add an Input Layer
+        input_layer = layers.Input((70,))
 
-        for model in models:
-            # nofeatures_accuracy = train_model(model,xtrain,ytrain,xvalid)[0]
+        # Add the word embedding Layer
+        embedding_layer = layers.Embedding(len(word_index) + 1, 300, weights=[embedding_matrix], trainable=False)(
+            input_layer)
+        embedding_layer = layers.SpatialDropout1D(0.3)(embedding_layer)
 
-            # count vectorizer object
-            cvo_accuracy = train_model(model,xtrain_count,ytrain,xvalid_count)[0]
+        # Add the convolutional Layer
+        conv_layer = layers.Convolution1D(100, 3, activation="relu")(embedding_layer)
 
-            # bag of words
-            bow_accuracy = train_model(model, xtrain_bow, ytrain, xvalid_bow)[0]
-            model_name= model.__class__.__name__
+        # Add the pooling Layer
+        pooling_layer = layers.GlobalMaxPool1D()(conv_layer)
 
-            # TF-IDF
-            tfidf_accuracy = train_model(model, xtrain_tfidf, ytrain, xvalid_tfidf)[0]
+        # Add the output Layers
+        output_layer1 = layers.Dense(50, activation="relu")(pooling_layer)
+        output_layer1 = layers.Dropout(0.25)(output_layer1)
+        output_layer2 = layers.Dense(1, activation="sigmoid")(output_layer1)
 
-            entries.append((model_name,  cvo_accuracy, bow_accuracy,tfidf_accuracy))
+        # Compile the model
+        model = mdl.Model(inputs=input_layer, outputs=output_layer2)
+        model.compile(optimizer=optimizers.Adam(), loss='binary_crossentropy')
 
-        cv_df = pd.DataFrame(entries, columns=['model_name','cvo','bog', 'tfidf_word_lvl'])
-        print(cv_df)
-    else:
-        CV=10
-        nb = MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True)
-        accuracies = cross_val_score(nb, xtrain_count, ytrain, scoring='accuracy', cv=CV)
-        print(accuracies)
+        return model
 
+    # START OF TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS
+    models=[MultinomialNB(),LogisticRegression(solver='lbfgs'), XGBClassifier()]
+    for model in models:
+        model_name = model.__class__.__name__
+        # Model on Count Vectors
+        accuracy = train_model(model, xtrain_count, ytrain, xvalid_count)
+        print(model_name, " Count Vectors: ", accuracy)
+        # Model on Word Level TF IDF Vectors
+        accuracy = train_model(model, xtrain_tfidf, ytrain, xvalid_tfidf)
+        print(model_name," WordLevel TF-IDF: ", accuracy)
+        # Model on Ngram Level TF IDF Vectors
+        accuracy = train_model(model, xtrain_tfidf_ngram, ytrain, xvalid_tfidf_ngram)
+        print(model_name," N-Gram Vectors: ", accuracy)
+        # Model on Character Level TF IDF Vectors
+        accuracy = train_model(model, xtrain_tfidf_ngram_chars, ytrain, xvalid_tfidf_ngram_chars)
+        print(model_name," CharLevel Vectors: ", accuracy)
+        # Model on Character Level TF IDF Vectors
+        accuracy = train_model(model, xtrain_bow, ytrain, xvalid_bow)
+        print(model_name," Bag of Words: ", accuracy)
+    # END OF TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS
 
+    # START TRAINING WITH SHALLOW NEURAL NETWORKS
+    classifier = create_model_architecture(xtrain_tfidf_ngram.shape[1])
+    accuracy = train_model(classifier, xtrain_tfidf_ngram, ytrain, xvalid_tfidf_ngram, is_neural_net=True)
+    print("NN, Ngram Level TF IDF Vectors", accuracy)
+    # END TRAINING WITH SHALLOW NEURAL NETWORKS
 
+    #START TRAINING WITH DEEP NEURAL NETWORKS
 
-    #SNN = create_model_architecture(xtrain_tfidf.shape[1])
-    #models=[MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True),SVC(kernel='linear'),LogisticRegression( solver='lbfgs'),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 4), random_state=1)]
-    # entries=[]
-    # for model in models:
-    #     # nofeatures_accuracy = train_model(model,xtrain,ytrain,xvalid)[0]
-    #
-    #     # count vectorizer object
-    #     cvo_accuracy = train_model(model,xtrain_count,ytrain,xvalid_count)[0]
-    #
-    #     # bag of words
-    #     bow_accuracy = train_model(model, xtrain_bow, ytrain, xvalid_bow)[0]
-    #     model_name= model.__class__.__name__
-    #
-    #     # TF-IDF
-    #     tfidf_accuracy = train_model(model, xtrain_tfidf, ytrain, xvalid_tfidf)[0]
-    #
-    #     entries.append((model_name,  cvo_accuracy, bow_accuracy,tfidf_accuracy))
-    #
-    # cv_df = pd.DataFrame(entries, columns=['model_name','cvo','bog', 'tfidf_word_lvl'])
-    # print(cv_df)
-    #
-    #
-    # snn_accuracy = train_model(SNN, xtrain_tfidf, ytrain, xvalid_tfidf, is_neural_net=True)[0]
-    # print(snn_accuracy)
+    #END TRAINING WITH DEEP NEURAL NETWORKS
 
-    # nb= MultinomialNB(alpha=1.0, class_prior=None, fit_prior=True).fit(xtrain_count,ytrain)
-    # prediction = nb.predict(xvalid_count)
-    # print(f1_score(yvalid, prediction))
-    # entries=[]
-    # entries.append()
-#     CV = 2
-#     cv_df = pd.DataFrame(index=range(CV * len(models)))
-#     entries = []
-#     for model in models:
-#         model_name = model.__class__.__name__
-#         accuracies = cross_val_score(model, xtrain_count, ytrain, scoring='accuracy', cv=CV)
-#         for fold_idx, accuracy in enumerate(accuracies):
-#             entries.append((model_name, fold_idx, accuracy))
-#     cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
-#
-#     print(cv_df.groupby('model_name').accuracy.mean())
-#
-#
-# startTraining(train,"tweet","label")
+startTraining(train,"SentimentText","Sentiment")
 
-startTraining(train, "SentimentText", "Sentiment",multitrain=True)
-
-
+exit(0)
