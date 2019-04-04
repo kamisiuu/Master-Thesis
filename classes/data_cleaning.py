@@ -27,7 +27,6 @@ def clean_data(train,train_tweet):
     train[train_tweet] = train[train_tweet].apply(lambda x: " ".join(x.lower() for x in x.split()))
 
     # Removal of stopwords
-
     stop = stopwords.words('english')
     train[train_tweet] = train[train_tweet].apply(lambda x: " ".join(x for x in x.split() if x not in stop))
 

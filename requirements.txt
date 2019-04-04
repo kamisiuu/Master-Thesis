@@ -9,10 +9,11 @@ numpy
 pandas
 xgboost 
 sklearn 
-tensorflow
+tensorflow-gpu
 keras
 matplotlib
 nltk
 wordcloud
 seaborn
 tabulate
+textblob
