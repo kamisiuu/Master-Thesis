@@ -33,7 +33,7 @@ train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
 # test = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
 
 #train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
-#test = pd.read_csv("data/dataset_2/test.csv", delimiter=None, header='infer', names=None, index_col=None,  )
+#test = pd.read_csv("data/dataset_2/test.csv", delimiter=None, header='infer', names=None, index_col=None, encoding='latin-1')
 
 #preprocessing
 
@@ -43,7 +43,7 @@ train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
 
 
 
-def startTraining(train,train_tweet,train_label, dataexplore=False):
+def startTraining(train,train_tweet,train_label, dataexplore=False, storemodel=False):
     if dataexplore:
         exp1= ExploringData(train,train_tweet,train_label)
         exp1.runall()
@@ -181,14 +181,14 @@ def startTraining(train,train_tweet,train_label, dataexplore=False):
 
     # START TRAINING WITH SHALLOW NEURAL NETWORKS
     classifier = create_model_architecture(xtrain_tfidf_ngram.shape[1])
-    accuracy = train_model(classifier, xtrain_tfidf_ngram, ytrain, xvalid_tfidf_ngram, is_neural_net=True)
-    print("NN, Ngram Level TF IDF Vectors", accuracy)
+    accuracy1 = train_model(classifier, xtrain_tfidf_ngram, ytrain, xvalid_tfidf_ngram, is_neural_net=True)
+    print("NN, Ngram Level TF IDF Vectors", accuracy1)
     # END TRAINING WITH SHALLOW NEURAL NETWORKS
 
     # START TRAINING WITH SHALLOW NEURAL NETWORKS
     classifier = create_model_architecture(xtrain_bow.shape[1])
-    accuracy = train_model(classifier, xtrain_bow, ytrain, xvalid_bow, is_neural_net=True)
-    print("NN, bow", accuracy)
+    accuracy2 = train_model(classifier, xtrain_bow, ytrain, xvalid_bow, is_neural_net=True)
+    print("NN, bow", accuracy2)
     # END TRAINING WITH SHALLOW NEURAL NETWORKS
 
     #START TRAINING WITH DEEP NEURAL NETWORKS
@@ -196,5 +196,5 @@ def startTraining(train,train_tweet,train_label, dataexplore=False):
     #END TRAINING WITH DEEP NEURAL NETWORKS
 
 #startTraining(train,"SentimentText","Sentiment")
-startTraining(train,"tweet","label",dataexplore=True)
+startTraining(train,"tweet","label")
 exit(0)

@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 import nltk
 from nltk.corpus import stopwords
@@ -31,14 +32,14 @@ def clean_data(train,train_tweet):
     train[train_tweet] = train[train_tweet].apply(lambda x: " ".join(x for x in x.split() if x not in stop))
 
     # Common word removal
-    # freq = pd.Series(' '.join(combi['tidy_tweet']).split()).value_counts()[:10]
-    # freq = list(freq.index)
-    # combi['tidy_tweet'] = combi['tidy_tweet'].apply(lambda x: " ".join(x for x in x.split() if x not in freq))
+    freq = pd.Series(' '.join(train[train_tweet]).split()).value_counts()[:10]
+    freq = list(freq.index)
+    train[train_tweet] = train[train_tweet].apply(lambda x: " ".join(x for x in x.split() if x not in freq))
 
     # Rare word removal
-    # freq = pd.Series(' '.join(combi['tidy_tweet']).split()).value_counts()[-10:]
-    # freq = list(freq.index)
-    # combi['tidy_tweet'] = combi['tidy_tweet'].apply(lambda x: " ".join(x for x in x.split() if x not in freq))
+    freq = pd.Series(' '.join(train[train_tweet]).split()).value_counts()[-10:]
+    freq = list(freq.index)
+    train[train_tweet] = train[train_tweet].apply(lambda x: " ".join(x for x in x.split() if x not in freq))
 
 
     # Tokenization process of building a dictionary and transform document into vectors

@@ -14,13 +14,16 @@ import matplotlib.pyplot as plt
 import re
 
 class ExploringData:
+    # this function constructs a class ExploringData
     def __init__(self,data,data_text,data_label):
         self.data=data
         self.data_text=data_text
         self.data_label=data_label
-    # this function counts number of categories within a column
+
+    # This function counts number of categories within a column
     def count_categories_within_column(self,plot=False):
-        print('\nNumber of each category within column\n', self.data[self.data_label].value_counts())
+        print('\nNumber of each category within column\n',
+              self.data[self.data_label].value_counts())
         if plot:
             plot_size = plt.rcParams["figure.figsize"]
             print(plot_size[0])
@@ -29,37 +32,47 @@ class ExploringData:
             plot_size[0] = 8
             plot_size[1] = 6
             plt.rcParams["figure.figsize"] = plot_size
-            self.data[self.data_label].value_counts().plot(kind='pie', autopct='%1.0f%%',
-                                                                 colors=["blue",  "red"])
-            #this function counts number of missing values within whole dataset
+            self.data[self.data_label].\
+                value_counts().plot(kind='pie', autopct='%1.0f%%',
+                                    colors=["blue",  "red"])
+
+    # This function counts number of missing values within whole dataset
     def checkfor_missingvalues(self):
         print ('\nMissing Values in dataset\n',self.data.isnull().sum())
-    #  Understanding the common words used in the tweets: WordCloud
-    def explore_common_words(self):
-        all_words = ' '.join([text for text in self.data[self.data_text]])
 
-        wordcloud = WordCloud(width=800, height=500, random_state=21, max_font_size=110).generate(all_words)
+    # This function shows a diagram with common words used in
+    # the tweets: WordCloud
+    def explore_common_words(self):
+        all_words=' '.join([text for text in self.data[self.data_text]])
+
+        wordcloud=WordCloud(width=800, height=500, random_state=21,
+                        max_font_size=110).generate(all_words)
 
         plt.figure(figsize=(10, 7))
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis('off')
         plt.show()
 
-# Words in non racist/sexist tweets
+    # This function plots diagram with words in non racist/sexist tweets
     def explore_non_racist_sexist_tweets(self):
-        normal_words = ' '.join([text for text in self.data[self.data_text][self.data[self.data_label] == 0]])
-        wordcloud = WordCloud(width=800, height=500, random_state=21, max_font_size=110).generate(normal_words)
+        normal_words = ' '.join([text for text in self.data[self.data_text]
+        [self.data[self.data_label] == 0]])
+        wordcloud = WordCloud(width=800, height=500, random_state=21,
+                              max_font_size=110).generate(normal_words)
         plt.figure(figsize=(10, 7))
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis('off')
         plt.title('Words in non racist/sexist tweets')
         plt.show()
 
-    # Racist/Sexist Tweets
+    # This function plots diagram with racist/Sexist Tweets
     def explore_racist_sexist_tweets(self):
-        negative_words = ' '.join([text for text in self.data[self.data_text][self.data[self.data_label] == 1]])
+        negative_words = ' '.join([text for text in
+                                   self.data[self.data_text]
+        [self.data[self.data_label] == 1]])
         wordcloud = WordCloud(width=800, height=500,
-                          random_state=21, max_font_size=110).generate(negative_words)
+                          random_state=21, max_font_size=110).\
+            generate(negative_words)
         plt.figure(figsize=(10, 7))
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis('off')
@@ -74,35 +87,43 @@ class ExploringData:
                 ht = re.findall(r"#(\w+)", i)
                 hashtags.append(ht)
             return hashtags
+        try:
+            # extracting hashtags from non racist/sexist tweets
+            HT_regular = hashtag_extract(
+                self.data[self.data_text][self.data[self.data_label]==0])
+            # extracting hashtags from racist/sexist tweets
+            HT_negative = hashtag_extract(
+                self.data[self.data_text][self.data[self.data_label]==1])
 
-        # extracting hashtags from non racist/sexist tweets
-        HT_regular = hashtag_extract(self.data[self.data_text][self.data[self.data_label] == 0])
-        # extracting hashtags from racist/sexist tweets
-        HT_negative = hashtag_extract(self.data[self.data_text][self.data[self.data_label] == 1])
+            # unnesting list
+            HT_regular = sum(HT_regular, [])
+            HT_negative = sum(HT_negative, [])
+            a = nltk.FreqDist(HT_regular)
+            d = pd.DataFrame({'Hashtag': list(a.keys()),
+                              'Count': list(a.values())})
+            # selecting top 10 most frequent hashtags
+            d = d.nlargest(columns="Count", n=10)
+            plt.figure(figsize=(16, 5))
+            ax = sns.barplot(data=d, x="Hashtag", y="Count")
+            ax.set(ylabel='Count')
+            plt.title('Non-Racist/Sexist Tweets of HASHTAGS')
+            plt.show()
 
-        # unnesting list
-        HT_regular = sum(HT_regular, [])
-        HT_negative = sum(HT_negative, [])
-        a = nltk.FreqDist(HT_regular)
-        d = pd.DataFrame({'Hashtag': list(a.keys()),
-                          'Count': list(a.values())})
-        # selecting top 10 most frequent hashtags
-        d = d.nlargest(columns="Count", n=10)
-        plt.figure(figsize=(16, 5))
-        ax = sns.barplot(data=d, x="Hashtag", y="Count")
-        ax.set(ylabel='Count')
-        plt.title('Non-Racist/Sexist Tweets of HASHTAGS')
-        plt.show()
+            b = nltk.FreqDist(HT_negative)
+            e = pd.DataFrame({'Hashtag': list(b.keys()),'Count':
+                list(b.values())})
+            # selecting top 10 most frequent hashtags
+            e = e.nlargest(columns="Count", n=10)
+            plt.figure(figsize=(16, 5))
+            ax = sns.barplot(data=e, x="Hashtag", y="Count")
+            ax.set(ylabel='Count')
+            plt.title('Racist/Sexist Tweets of HASHTAGS')
+            plt.show()
+        except Exception:
+            print ("there are no hashtags in your data")
+            pass
+        else:pass
 
-        b = nltk.FreqDist(HT_negative)
-        e = pd.DataFrame({'Hashtag': list(b.keys()), 'Count': list(b.values())})
-        # selecting top 10 most frequent hashtags
-        e = e.nlargest(columns="Count", n=10)
-        plt.figure(figsize=(16, 5))
-        ax = sns.barplot(data=e, x="Hashtag", y="Count")
-        ax.set(ylabel='Count')
-        plt.title('Racist/Sexist Tweets of HASHTAGS')
-        plt.show()
 
     # this method runs all previous methods
     def runall(self):
@@ -112,4 +133,36 @@ class ExploringData:
         self.explore_non_racist_sexist_tweets()
         self.explore_racist_sexist_tweets()
         self.explore_hashtags()
+
+train1 = pd.read_csv("../data/dataset_1/train.csv", header='infer',
+                     index_col=None)
+test1 = pd.read_csv("../data/dataset_1/test.csv", delimiter=None,
+                    header='infer', names=None, index_col=None, encoding='latin-1')
+
+train2 = pd.read_csv("../data/dataset_2/train.csv", header='infer',
+                     index_col=None)
+test2 = pd.read_csv("../data/dataset_2/test.csv", delimiter=None,
+                    header='infer',
+                    names=None, index_col=None, encoding='latin-1')
+print('\n Shape of dataset 1 - train, first number indicates number of '
+      'rows second number of columns \n',train1.shape)
+print('\n Shape of dataset 1 - test, first number indicates number of '
+      'rows second number of columns \n ',test1.shape)
+print('\n First 100 rows of dataset 1 - train \n', train1.head(100))
+
+print('\n Shape of dataset 2 - train, first number indicates number of '
+      'rows second number of columns \n',train2.shape)
+print('\n Shape of dataset 2 - test, first number indicates number of '
+      'rows second number of columns \n ',test2.shape)
+print('\n First 100 rows of dataset 2 - train \n', train2.head(100))
+
+print("\nSTART OF EXPLORING FIRST DATASET\n")
+ex1=ExploringData(train1,"tweet","label")
+ex1.runall()
+print("\nEND OF EXPLORING FIRST DATASET\n")
+
+print("\nSTART OF EXPLORING SECOND DATASET\n")
+ex2=ExploringData(train2,"SentimentText","Sentiment")
+ex2.runall()
+print("\nEND OF EXPLORING SECOND DATASET\n")
 
