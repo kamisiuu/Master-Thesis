@@ -103,7 +103,7 @@ def startTraining(train,train_tweet,train_label, dataexplore=False, storemodel=F
 
     #END OF WORD EMBEDDINGS FEATURE
 
-    def train_model(classifier, feature_vector_train, label, feature_vector_valid, is_neural_net=False):
+    def train_model(classifier, feature_name, feature_vector_train, label, feature_vector_valid, is_neural_net=False):
         # fit the training dataset on the classifier
 
         if storemodel:
@@ -115,7 +115,7 @@ def startTraining(train,train_tweet,train_label, dataexplore=False, storemodel=F
 
             if is_neural_net:
                 predictions = predictions.argmax(axis=-1)
-            filename=('data/results/stored_trained_models/'+classifier.__class__.__name__ + feature_vector_train.__class__.__name__+'.sav')
+            filename=('data/results/stored_trained_models/'+classifier.__class__.__name__ + feature_name+'.sav')
             joblib.dump(model, filename)
             return metrics.accuracy_score(predictions, yvalid)
         else:
@@ -177,78 +177,63 @@ def startTraining(train,train_tweet,train_label, dataexplore=False, storemodel=F
               SGDClassifier(loss='hinge', penalty='l2',alpha=1e-3, random_state=42, max_iter=5, tol=None),
               KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),
               MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)]
-    features = ([xtrain_count,  xvalid_count],[xtrain_tfidf, xvalid_tfidf],[xtrain_tfidf_ngram,  xvalid_tfidf_ngram],[xtrain_tfidf_ngram_chars,  xvalid_tfidf_ngram_chars],[xtrain_bow, xvalid_bow])
-    entries = []
 
+    entries = []
     featureList=[]
     featureList.append(Feature('CountVect',xtrain_count,xvalid_count))
     featureList.append(Feature('TF-IDF-WORD',xtrain_tfidf,xvalid_tfidf))
-    # featureList.append(Feature())
-    # featureList.append(Feature())
+    featureList.append(Feature('TF-IDF-NGRAM-WORD',xtrain_tfidf_ngram,  xvalid_tfidf_ngram))
+    featureList.append(Feature('TF-IDF-NGRAM-CHARS',xtrain_tfidf_ngram_chars,xvalid_tfidf_ngram_chars))
+    featureList.append(Feature('BAG-OF-WORDS-NGRAM',xtrain_bow,xvalid_bow))
     for model in models:
         for feature in featureList:
             model_name = model.__class__.__name__
             feature_name = feature.name
-            # Model on Count Vectors
-            accuracy = train_model(model, feature.xtrain, ytrain, feature.xvalid)
-
-
+            accuracy = train_model(model, feature.name, feature.xtrain, ytrain, feature.xvalid)
             entries.append((model_name, accuracy, feature_name))
+    for feature in featureList:
+        model_name = 'shallow neural networks'
+        feature_name = feature.name
+        classifier = create_model_architecture(feature.xtrain.shape[1])
+        accuracy1 = train_model(classifier, feature_name, feature.xtrain, ytrain, feature.xvalid, is_neural_net=True)
+        entries.append((model_name, accuracy1, feature_name))
 
     cv_df = pd.DataFrame(entries,columns=['model_name', 'accuracy','feature'])
     print(cv_df)
-    # for model in models:
-    #     model_name = model.__class__.__name__
-    #     # Model on Count Vectors
-    #     cv_accuracy = train_model(model, xtrain_count, ytrain, xvalid_count)
-    #
-    #     # Model on Word Level TF IDF Vectors
-    #     tfidf_word_accuracy = train_model(model, xtrain_tfidf, ytrain, xvalid_tfidf)
-    #
-    #     # Model on Ngram Level TF IDF Vectors
-    #     tfidf_ngram_accuracy= train_model(model, xtrain_tfidf_ngram, ytrain, xvalid_tfidf_ngram)
-    #
-    #     # Model on Character Level TF IDF Vectors
-    #     tfidf_character_accuracy = train_model(model, xtrain_tfidf_ngram_chars, ytrain, xvalid_tfidf_ngram_chars)
-    #
-    #     # Model on  bag of ngrams
-    #     bow_accuracy = train_model(model, xtrain_bow, ytrain, xvalid_bow)
-    #     entries.append((model_name, cv_accuracy,tfidf_word_accuracy,tfidf_ngram_accuracy,tfidf_character_accuracy,bow_accuracy))
-    #
-    #     cv_df = pd.DataFrame(entries, columns=['model_name', 'cvo', 'tfidf_word_lvl','tfidf_ngram','tfidf_character_lvl','bow-of-ngrams'])
 
 
 
 
 
+
+    # # # START TRAINING WITH SHALLOW NEURAL NETWORKS
+    # classifier = create_model_architecture(xtrain_tfidf.shape[1])
+    # accuracy1 = train_model(classifier, xtrain_tfidf, ytrain, xvalid_tfidf, is_neural_net=True)
+    # print("NN, TF IDF Vectors", accuracy1)
+    # # END TRAINING WITH SHALLOW NEURAL NETWORKS
+    #
     # # START TRAINING WITH SHALLOW NEURAL NETWORKS
-    classifier = create_model_architecture(xtrain_tfidf.shape[1])
-    accuracy1 = train_model(classifier, xtrain_tfidf, ytrain, xvalid_tfidf, is_neural_net=True)
-    print("NN, TF IDF Vectors", accuracy1)
-    # END TRAINING WITH SHALLOW NEURAL NETWORKS
-
-    # START TRAINING WITH SHALLOW NEURAL NETWORKS
-    classifier = create_model_architecture(xtrain_tfidf_ngram.shape[1])
-    accuracy2 = train_model(classifier, xtrain_tfidf_ngram, ytrain, xvalid_tfidf_ngram, is_neural_net=True)
-    print("NN, Ngram Level TF IDF Vectors", accuracy1)
-    # END TRAINING WITH SHALLOW NEURAL NETWORKS
-
-    # START TRAINING WITH SHALLOW NEURAL NETWORKS
-    classifier = create_model_architecture(xtrain_tfidf_ngram_chars.shape[1])
-    accuracy3 = train_model(classifier, xtrain_tfidf_ngram_chars, ytrain, xvalid_tfidf_ngram_chars, is_neural_net=True)
-    print("NN, TF ID vectors character level", accuracy2)
-    # END TRAINING WITH SHALLOW NEURAL NETWORKS
-
-    # START TRAINING WITH SHALLOW NEURAL NETWORKS
-    classifier = create_model_architecture(xtrain_bow.shape[1])
-    accuracy4 = train_model(classifier, xtrain_bow, ytrain, xvalid_bow, is_neural_net=True)
-    print("NN, bow", accuracy2)
-    # END TRAINING WITH SHALLOW NEURAL NETWORKS
-
-    # START TRAINING WITH SHALLOW NEURAL NETWORKS
-    classifier = create_model_architecture(xtrain_count.shape[1])
-    accuracy5 = train_model(classifier, xtrain_count, ytrain, xvalid_count, is_neural_net=True)
-    print("NN, bow", accuracy2)
+    # classifier = create_model_architecture(xtrain_tfidf_ngram.shape[1])
+    # accuracy2 = train_model(classifier, xtrain_tfidf_ngram, ytrain, xvalid_tfidf_ngram, is_neural_net=True)
+    # print("NN, Ngram Level TF IDF Vectors", accuracy1)
+    # # END TRAINING WITH SHALLOW NEURAL NETWORKS
+    #
+    # # START TRAINING WITH SHALLOW NEURAL NETWORKS
+    # classifier = create_model_architecture(xtrain_tfidf_ngram_chars.shape[1])
+    # accuracy3 = train_model(classifier, xtrain_tfidf_ngram_chars, ytrain, xvalid_tfidf_ngram_chars, is_neural_net=True)
+    # print("NN, TF ID vectors character level", accuracy2)
+    # # END TRAINING WITH SHALLOW NEURAL NETWORKS
+    #
+    # # START TRAINING WITH SHALLOW NEURAL NETWORKS
+    # classifier = create_model_architecture(xtrain_bow.shape[1])
+    # accuracy4 = train_model(classifier, xtrain_bow, ytrain, xvalid_bow, is_neural_net=True)
+    # print("NN, bow", accuracy2)
+    # # END TRAINING WITH SHALLOW NEURAL NETWORKS
+    #
+    # # START TRAINING WITH SHALLOW NEURAL NETWORKS
+    # classifier = create_model_architecture(xtrain_count.shape[1])
+    # accuracy5 = train_model(classifier, xtrain_count, ytrain, xvalid_count, is_neural_net=True)
+    # print("NN, bow", accuracy2)
 
     # entries.append(('Shallow Neural Networks', accuracy5, accuracy1, accuracy2,accuracy3, accuracy4))
     # cv_df = pd.DataFrame(entries, columns=['model_name', 'cvo', 'tfidf_word_lvl', 'tfidf_ngram', 'tfidf_character_lvl',
