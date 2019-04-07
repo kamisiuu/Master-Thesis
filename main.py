@@ -1,22 +1,15 @@
 import pandas as pd
 import warnings
-
-
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 from xgboost import XGBClassifier
 from keras import layers, models as mdl, optimizers
-
 from sklearn import metrics, preprocessing
-
 from classes.data_exploring import ExploringData
-
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from sklearn.naive_bayes import MultinomialNB
-
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from classes import data_cleaning as dataclean
@@ -27,21 +20,11 @@ from sklearn.externals import joblib
 # w3schools.com/python
 # https://www.analyticsvidhya.com/blog/2017/06/word-embeddings-count-word2veec/
 
-
-#
-
 # train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
 # test = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
 
 train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
 #test = pd.read_csv("data/dataset_2/test.csv", delimiter=None, header='infer', names=None, index_col=None, encoding='latin-1')
-
-#preprocessing
-
-#train = preproc.clean_data(train,"SentimentText")
-#dtexplr.explore_non_racist_sexist_tweets(train,"SentimentText","Sentiment")
-#dtexplr.explore_hashtags(train,"SentimentText","Sentiment")
-
 
 
 def Train(train,train_tweet,train_label, dataexplore=False, storemodel=False):
@@ -67,7 +50,7 @@ def Train(train,train_tweet,train_label, dataexplore=False, storemodel=False):
             self.xvalid=xvalid
 
     # START OF COUNT VECTORS AS FEATURES
-    # create a count vectorizer object and transform the training and validation data using count vectorizer object
+    # creates a count vectorizer object and transform the training and validation data using count vectorizer object
     count_vect = CountVectorizer(analyzer='word', token_pattern=r'\w{1,}')
     count_vect.fit(train[train_tweet])
     xtrain_count =  count_vect.transform(xtrain)
@@ -98,8 +81,6 @@ def Train(train,train_tweet,train_label, dataexplore=False, storemodel=False):
     train_bow.fit(train[train_tweet])
     xtrain_bow = train_bow.transform(xtrain)
     xvalid_bow = train_bow.transform(xvalid)
-
-
     # END OF BAG OF WORDS FEATURE
 
     #START OF WORD EMBEDDINGS FEATURE

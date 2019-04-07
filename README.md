@@ -44,6 +44,7 @@
     <li>TF-IDF</li>
     <li>TF-IDF-Ngram-words</li>
     <li>TF-IFD-Ngram-chars</li>
+    <li>Word2Vec</li>
 </ol>
 </div>
 <div>
