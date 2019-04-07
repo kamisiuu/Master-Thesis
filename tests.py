@@ -5,14 +5,9 @@ from classes.data_upload import Upload
 #train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
 #test = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
 
-train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
-test = pd.read_csv("data/dataset_1/test.csv", delimiter=None, header='infer', names=None, index_col=None, encoding='latin-1')
+features = [[1,2],[3,4]]
 
-print(train.shape)
-print(test.shape)
-ex1=ExploringData(train,"tweet","label")
-
-#ex1=ExploringData(train,"SentimentText","Sentiment")
-ex1.runall()
+for feature in features:
+    print(feature[0])
 
 

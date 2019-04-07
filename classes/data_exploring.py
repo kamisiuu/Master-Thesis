@@ -134,35 +134,3 @@ class ExploringData:
         self.explore_racist_sexist_tweets()
         self.explore_hashtags()
 
-train1 = pd.read_csv("../data/dataset_1/train.csv", header='infer',
-                     index_col=None)
-test1 = pd.read_csv("../data/dataset_1/test.csv", delimiter=None,
-                    header='infer', names=None, index_col=None, encoding='latin-1')
-
-train2 = pd.read_csv("../data/dataset_2/train.csv", header='infer',
-                     index_col=None)
-test2 = pd.read_csv("../data/dataset_2/test.csv", delimiter=None,
-                    header='infer',
-                    names=None, index_col=None, encoding='latin-1')
-print('\n Shape of dataset 1 - train, first number indicates number of '
-      'rows second number of columns \n',train1.shape)
-print('\n Shape of dataset 1 - test, first number indicates number of '
-      'rows second number of columns \n ',test1.shape)
-print('\n First 100 rows of dataset 1 - train \n', train1.head(100))
-
-print('\n Shape of dataset 2 - train, first number indicates number of '
-      'rows second number of columns \n',train2.shape)
-print('\n Shape of dataset 2 - test, first number indicates number of '
-      'rows second number of columns \n ',test2.shape)
-print('\n First 100 rows of dataset 2 - train \n', train2.head(100))
-
-print("\nSTART OF EXPLORING FIRST DATASET\n")
-ex1=ExploringData(train1,"tweet","label")
-ex1.runall()
-print("\nEND OF EXPLORING FIRST DATASET\n")
-
-print("\nSTART OF EXPLORING SECOND DATASET\n")
-ex2=ExploringData(train2,"SentimentText","Sentiment")
-ex2.runall()
-print("\nEND OF EXPLORING SECOND DATASET\n")
-

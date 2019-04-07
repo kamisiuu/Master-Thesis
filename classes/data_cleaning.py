@@ -41,6 +41,9 @@ def clean_data(train,train_tweet):
     freq = list(freq.index)
     train[train_tweet] = train[train_tweet].apply(lambda x: " ".join(x for x in x.split() if x not in freq))
 
+    # # Spelling correction
+    # from textblob import TextBlob
+    # train[train_tweet].apply(lambda x: str(TextBlob(x).correct()))
 
     # Tokenization process of building a dictionary and transform document into vectors
     tokenized_tweet = train[train_tweet].apply(lambda x: x.split())
