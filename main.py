@@ -115,7 +115,7 @@ def startTraining(train,train_tweet,train_label, dataexplore=False, storemodel=F
 
             if is_neural_net:
                 predictions = predictions.argmax(axis=-1)
-            filename=('data/results/stored_trained_models/'+classifier.__class__.__name__ + feature_name+'.sav')
+            filename=('data/results/stored_trained_models/'+classifier.__class__.__name__ +'_'+ feature_name+'.sav')
             joblib.dump(model, filename)
             return metrics.accuracy_score(predictions, yvalid)
         else:
@@ -185,6 +185,7 @@ def startTraining(train,train_tweet,train_label, dataexplore=False, storemodel=F
     featureList.append(Feature('TF-IDF-NGRAM-WORD',xtrain_tfidf_ngram,  xvalid_tfidf_ngram))
     featureList.append(Feature('TF-IDF-NGRAM-CHARS',xtrain_tfidf_ngram_chars,xvalid_tfidf_ngram_chars))
     featureList.append(Feature('BAG-OF-WORDS-NGRAM',xtrain_bow,xvalid_bow))
+
     for model in models:
         for feature in featureList:
             model_name = model.__class__.__name__
@@ -195,12 +196,13 @@ def startTraining(train,train_tweet,train_label, dataexplore=False, storemodel=F
         model_name = 'shallow neural networks'
         feature_name = feature.name
         classifier = create_model_architecture(feature.xtrain.shape[1])
+        print(classifier)
         accuracy1 = train_model(classifier, feature_name, feature.xtrain, ytrain, feature.xvalid, is_neural_net=True)
         entries.append((model_name, accuracy1, feature_name))
 
     cv_df = pd.DataFrame(entries,columns=['model_name', 'accuracy','feature'])
-    print(cv_df)
-
+    # print(cv_df)
+    cv_df.to_csv('data/results/accuracy_table/all_results_from_training.csv')
 
 
 
