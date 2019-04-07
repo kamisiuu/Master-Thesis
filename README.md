@@ -33,6 +33,17 @@
   300k unlabeled sentences, URL: https://www.kaggle.com/c/twitter-sentiment-analysis2/data. </li>
 </ol>
 </div>
+
+<div>
+<h3>COMPARISON OF DIFFERENT DATA TRANSFORMATION FEATURES</h3>
+<ol>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ol>
+</div>
 <div>
 <h3>USING PLATFORMS AS:</h3>
   <p>1. PYTHON 3.6.7, SCIKIT-LEARN, TENSORFLOW, PANDAS, NUMPY</p>
