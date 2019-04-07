@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sentiment Analysis Techniques</title>
+</head>
 <body>
 <div>
+
   <h1>Sentiment Analysis Techniques - A Comparative Study</h1>
   <h3>COMPERATIVE STUDY USING FOLLOWING ALGORITHMS:</h3>
 </div>
