@@ -182,11 +182,12 @@ def Train(train,train_tweet,train_label, dataexplore=False, storemodel=False):
 
     entries = []
     featureList=[]
-    featureList.append(Feature('CountVect',xtrain_count,xvalid_count))
+    featureList.append(Feature('BAG-OF-WORDS',xtrain_count,xvalid_count))
+    featureList.append(Feature('BAG-OF-WORDS-NGRAM', xtrain_bow, xvalid_bow))
     featureList.append(Feature('TF-IDF-WORD',xtrain_tfidf,xvalid_tfidf))
     featureList.append(Feature('TF-IDF-NGRAM-WORD',xtrain_tfidf_ngram,  xvalid_tfidf_ngram))
     featureList.append(Feature('TF-IDF-NGRAM-CHARS',xtrain_tfidf_ngram_chars,xvalid_tfidf_ngram_chars))
-    featureList.append(Feature('BAG-OF-WORDS-NGRAM',xtrain_bow,xvalid_bow))
+
 
     for model in models:
         for feature in featureList:

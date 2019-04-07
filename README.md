@@ -35,13 +35,13 @@
 </div>
 
 <div>
-<h3>COMPARISON OF DIFFERENT DATA TRANSFORMATION FEATURES</h3>
+<h3>TESTED ON DIFFERENT DATA TRANSFORMATION FEATURES</h3>
 <ol>
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
-    <li></li>
+    <li>Bag of Words</li>
+    <li>Bag of N-gram</li>
+    <li>TF-IDF</li>
+    <li>TF-IDF-Ngram-words</li>
+    <li>TF-IFD-Ngram-chars</li>
 </ol>
 </div>
 <div>
