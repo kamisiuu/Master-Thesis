@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
-from classes import data_cleaning as dataclean
+from classes import tweet_cleaner as dataclean
 from sklearn.externals import joblib
 # resources:
 # https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html

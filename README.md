@@ -5,7 +5,7 @@
 <div style="background-color: #f4511e;color: #ffffff;">
 
   <h1>Sentiment Analysis Techniques - A Comparative Study</h1>
-  <h3>COMPERATIVE STUDY USING FOLLOWING ALGORITHMS:</h3>
+  <h3>COMPARING FOLLOWING ALGORITHMS:</h3>
 </div>
 <ol>
   <li>Naive Bayes Classifier</li>
@@ -25,7 +25,7 @@
 <div>  
 <h3>TESTED ON FOLLOWING DATASETS:</h3>
 <ol>
-  <li>item UMICH SI650 - Sentiment Classification. 
+  <li>UMICH SI650 - Sentiment Classification. 
   This dataset was retrieved from competition on Kaggle and it was originally hosted by University of Michigan SI650 (Information
   Retrieval). The training data contains 7086 sentences that are already labeled with 1    (positive sentiment) or 0 (negative sentiment). 
   The test data contains 33052 sentences that are unlabeled URL: https://www.kaggle.com/c/si650winter11/rules</li>
@@ -37,7 +37,7 @@
 </div>
 
 <div>
-<h3>TESTED ON DIFFERENT DATA TRANSFORMATION FEATURES</h3>
+<h3>COMPARING DIFFERENT DATA TRANSFORMATION FEATURES</h3>
 <ol>
     <li>Bag of Words</li>
     <li>Bag of N-gram</li>
@@ -48,8 +48,11 @@
 </ol>
 </div>
 <div>
-<h3>USING PLATFORMS AS:</h3>
-  <p>1. PYTHON 3.6.7, SCIKIT-LEARN, TENSORFLOW, PANDAS, NUMPY</p>
+<h3>PLATFORMS USED IT THIS STUDY:</h3>
+  <p>1. PYTHON 3.6.7, SCIKIT-LEARN, TENSORFLOW, PANDAS, NUMPY, XGBOOST</p>
 </div>
 </body>
+<footer>
+Author = Kamil Lipski
+</footer>
 </html>
