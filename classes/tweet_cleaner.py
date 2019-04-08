@@ -125,14 +125,15 @@ class tweet_cleaner:
                   'lemmatization': 'lemmatization(cls.data, cls.tweetcolumn)',
                   'lower_case': 'lower_case(cls.data, cls.tweetcolumn)'}
     def __new__(cls, data, tweetcolumn, preprocessoptions=[]):
-        """
-               @Author=Kamil Lipski # This is a class constructor of class tweet_cleaner
+        """@Author=Kamil Lipski # This is a class constructor of class tweet_cleaner
 
-               :param data: you have to give it a dataset
-               :param tweetcolumn: you have to specify the column name that you what to remove noise from
-               :param preprocessoptions: 'noise'-removal of special characters,numbers,punctutation, twitter handles # 'short_words'-removal of short words #'stop_words'- removal of stop words #'rare_words'- removal of rare words#'lower_case' - transforms words into lower case #'tokenization' - transforms text into vectors #'stemming' - stemming is a rule-based process of stripping the suffixes (“ing”, “ly”, “es”, “s” etc) from a word. For example, For example – “play”, “player”, “played”, “plays” and “playing” are the different variations of the word – “play”.
-               :return: returns dataset after preprocessing
-               """
+        :param data: you have to give it a dataset
+        :param tweetcolumn: you have to specify the column name that you what to remove noise from
+        :param preprocessoptions: noise: -removal of special characters,numbers,punctutation, twitter handles # 'short_words'-removal of short words #'stop_words'- removal of stop words #'rare_words'- removal of rare words#'lower_case' - transforms words into lower case #'tokenization' - transforms text into vectors #'stemming' - stemming is a rule-based process of stripping the suffixes (“ing”, “ly”, “es”, “s” etc) from a word. For example, For example – “play”, “player”, “played”, “plays” and “playing” are the different variations of the word – “play”.
+
+        :return: returns dataset after preprocessing
+        """
+
         cls.data = data
         cls.tweetcolumn= tweetcolumn
         cls.preprocessoptions = preprocessoptions  # this gives
