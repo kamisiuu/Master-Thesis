@@ -22,3 +22,4 @@ wordcloud
 seaborn
 tabulate
 textblob
+textblob
