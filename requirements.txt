@@ -7,13 +7,12 @@
 # With this little text file all the necessary requirements to run the
 # project can be installed quickly in terminal using following command
 # $ pip install -r requirements.txt
-# or if you will use conda as your environment, use following command that also install dependencies
-# $ while read requirement; do conda install --yes $requirement; done < requirements.txt
-
+# or if you will use conda as your environment you may install it manually with conda commands each one separately because of the dependencies each one has
+#
 numpy
 pandas
-xgboost 
-sklearn
+py-xgboost-gpu
+scikit-learn
 tensorflow-gpu
 keras
 matplotlib
@@ -21,5 +20,4 @@ nltk
 wordcloud
 seaborn
 tabulate
-textblob
 textblob

@@ -9,7 +9,9 @@ from classes.tweet_cleaner import tweet_cleaner
 #data = pd.read_csv('data/results/accuracy_table/all_results_from_training.csv')
 
 
-data = tweet_cleaner(train,'tweet',preprocessoptions=['noise'])
+data = tweet_cleaner(train,'tweet',preprocessoptions = ['noise','short_words','stop_words','rare_words','common_words','stemming','lemmatization','lower_case']
+
+)
 print(data)
 
 

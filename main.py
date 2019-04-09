@@ -20,10 +20,11 @@ from sklearn.externals import joblib
 # w3schools.com/python
 # https://www.analyticsvidhya.com/blog/2017/06/word-embeddings-count-word2veec/
 
-# train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
+train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
 # test = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
 
-train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
+
+#train = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
 #test = pd.read_csv("data/dataset_2/test.csv", delimiter=None, header='infer', names=None, index_col=None, encoding='latin-1')
 
 
@@ -31,8 +32,7 @@ def Train(train,train_tweet,train_label, dataexplore=False, storemodel=False):
     if dataexplore:
         exp1= ExploringData(train,train_tweet,train_label)
         exp1.runall()
-    #clean data
-    train = dataclean.clean_data(train, train_tweet)
+
 
     # splitting data into training and validation set
     xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42,
@@ -41,7 +41,8 @@ def Train(train,train_tweet,train_label, dataexplore=False, storemodel=False):
     encoder = preprocessing.LabelEncoder()
     ytrain = encoder.fit_transform(ytrain)
     yvalid = encoder.fit_transform(yvalid)
-
+    train=dataclean.tweet_cleaner(train,train_tweet,preprocessoptions = ['noise','short_words','stop_words','rare_words','common_words','stemming','lemmatization','lower_case']
+)
     # This class helps further in
     class Feature:
         def __init__(self,name,xtrain=[],xvalid=[]):
@@ -239,7 +240,7 @@ def Train(train,train_tweet,train_label, dataexplore=False, storemodel=False):
 
     #END TRAINING WITH DEEP NEURAL NETWORKS
 
-Train(train,"SentimentText","Sentiment",storemodel=True)
-#Train(train,"tweet","label",storemodel=True)
+#Train(train,"SentimentText","Sentiment",storemodel=True)
+Train(train,"tweet","label",storemodel=True)
 
 exit(0)
