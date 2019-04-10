@@ -33,7 +33,7 @@ def Train(train,train_tweet,train_label, dataexplore=False, storemodel=False):
         exp1= ExploringData(train,train_tweet,train_label)
         exp1.runall()
 
-
+    train=dataclean.tweet_cleaner(train,train_tweet,preprocessoptions=['noise','short_words','stop_words','rare_words','common_words','lemmatization','lower_case'])
     # splitting data into training and validation set
     xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42,
                                                test_size=0.3)

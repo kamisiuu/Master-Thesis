@@ -94,7 +94,6 @@ class tweet_cleaner:
 
         :return: return the dataset
         """
-        noise().__doc__ = "this removes noise"
         cls.dataset = dataset
         cls.tweetcolumn= tweetcolumn
         cls.preprocessoptions = preprocessoptions  # this gives
