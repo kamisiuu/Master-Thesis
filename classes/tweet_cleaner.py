@@ -70,9 +70,7 @@ def lower_case(dataset, tweetcolumn):
     dataset[tweetcolumn] = dataset[tweetcolumn].apply(lambda x: " ".join(x.lower() for x in x.split()))
     return dataset
 
-
 class tweet_cleaner:
-
     global choiceList,dataset
     choiceList = {'noise': 'noise(dataset, tweetcolumn)',
                   'short_words': 'short_words(dataset, tweetcolumn)',
@@ -83,26 +81,31 @@ class tweet_cleaner:
                   'stemming': 'stemming(dataset, tweetcolumn)',
                   'lemmatization': 'lemmatization(dataset, tweetcolumn)',
                   'lower_case': 'lower_case(dataset, tweetcolumn)'}
-    def __new__(cls, dataset, tweetcolumn, preprocessoptions=['noise']):
+    def __new__(cls, dataset, tweetcolumn, preprocessoptions=False):
         """
 
         :param dataset: give it an DataFrame dataset
         :param tweetcolumn: the column you want to preprocess
-                ['noise','short_words','stop_words','rare_words','common_words','stemming','lemmatization','lower_case']
-
-
-
+        :param preprocessoptions: if not defined all cleaning options run automatically else if you define them you do it in following way
+                preprocessoptions=['noise','short_words','stop_words','rare_words','common_words','stemming','lemmatization','lower_case']
+                you can choose only between some of them too
         :return: return the dataset
         """
         cls.dataset = dataset
         cls.tweetcolumn= tweetcolumn
-        cls.preprocessoptions = preprocessoptions  # this gives
+        cls.preprocessoptions = preprocessoptions
 
-        for option in cls.preprocessoptions:
-            mycode= choiceList.get(option)
-            cls.dataset = exec(mycode)
-        mycode=0
+        if preprocessoptions:
+            for option in cls.preprocessoptions:
+                mycode = choiceList.get(option)
+                cls.dataset = exec(mycode)
+        else:
+            for choice in choiceList:
+                mycode= choiceList[choice]
+                cls.data = exec(mycode)
         return dataset
+
+
 
 
 
