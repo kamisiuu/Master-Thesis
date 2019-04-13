@@ -96,3 +96,51 @@ dataset_1,RNN-LSTM,0.42052023121387283,Word Embeddings
 dataset_1,RNN-GRU,0.42052023121387283,Word Embeddings
 dataset_1,RNN-Bidirectional,0.42052023121387283,Word Embeddings
 dataset_1,RCNN,0.42052023121387283,Word Embeddings
+dataset_2,MultinomialNB,0.7482081541487482,BAG-OF-WORDS
+dataset_2,MultinomialNB,0.725939260592726,BAG-OF-WORDS-NGRAM
+dataset_2,MultinomialNB,0.7234390105677234,TF-IDF-WORD
+dataset_2,MultinomialNB,0.7242724272427242,TF-IDF-NGRAM-WORD
+dataset_2,MultinomialNB,0.7073374004067073,TF-IDF-NGRAM-CHARS
+dataset_2,MultinomialNB,0.7073374004067073,TF-IDF-NGRAM-CHARS
+dataset_2,MultinomialNB,0.5451878521185451,Word Embeddings Wiki
+dataset_2,LogisticRegression,0.7564756475647565,BAG-OF-WORDS
+dataset_2,LogisticRegression,0.731039770643731,BAG-OF-WORDS-NGRAM
+dataset_2,LogisticRegression,0.7306063939727306,TF-IDF-WORD
+dataset_2,LogisticRegression,0.731073107310731,TF-IDF-NGRAM-WORD
+dataset_2,LogisticRegression,0.7474080741407474,TF-IDF-NGRAM-CHARS
+dataset_2,LogisticRegression,0.7474080741407474,TF-IDF-NGRAM-CHARS
+dataset_2,LogisticRegression,0.5602560256025603,Word Embeddings Wiki
+dataset_2,SGDClassifier,0.7482081541487482,BAG-OF-WORDS
+dataset_2,SGDClassifier,0.7203387005367203,BAG-OF-WORDS-NGRAM
+dataset_2,SGDClassifier,0.7228056138947228,TF-IDF-WORD
+dataset_2,SGDClassifier,0.7224389105577225,TF-IDF-NGRAM-WORD
+dataset_2,SGDClassifier,0.7388072140547388,TF-IDF-NGRAM-CHARS
+dataset_2,SGDClassifier,0.7384071740507384,TF-IDF-NGRAM-CHARS
+dataset_2,SGDClassifier,0.5192185885255192,Word Embeddings Wiki
+dataset_2,KNeighborsClassifier,0.6378304497116378,BAG-OF-WORDS
+dataset_2,KNeighborsClassifier,0.6423308997566424,BAG-OF-WORDS-NGRAM
+dataset_2,KNeighborsClassifier,0.6258292495916258,TF-IDF-WORD
+dataset_2,KNeighborsClassifier,0.6274294096076274,TF-IDF-NGRAM-WORD
+dataset_2,KNeighborsClassifier,0.6657999133246658,TF-IDF-NGRAM-CHARS
+dataset_2,KNeighborsClassifier,0.6657999133246658,TF-IDF-NGRAM-CHARS
+dataset_2,KNeighborsClassifier,0.538953895389539,Word Embeddings Wiki
+dataset_2,RandomForestClassifier,0.7078041137447078,BAG-OF-WORDS
+dataset_2,RandomForestClassifier,0.6918358502516918,BAG-OF-WORDS-NGRAM
+dataset_2,RandomForestClassifier,0.6951361802846951,TF-IDF-WORD
+dataset_2,RandomForestClassifier,0.6982364903156982,TF-IDF-NGRAM-WORD
+dataset_2,RandomForestClassifier,0.6615661566156615,TF-IDF-NGRAM-CHARS
+dataset_2,RandomForestClassifier,0.6641997533086642,TF-IDF-NGRAM-CHARS
+dataset_2,RandomForestClassifier,0.5644564456445644,Word Embeddings Wiki
+dataset_2,XGBClassifier,0.6794679467946795,BAG-OF-WORDS
+dataset_2,XGBClassifier,0.6572323899056572,BAG-OF-WORDS-NGRAM
+dataset_2,XGBClassifier,0.6592325899256593,TF-IDF-WORD
+dataset_2,XGBClassifier,0.6602660266026603,TF-IDF-NGRAM-WORD
+dataset_2,XGBClassifier,0.7015701570157016,TF-IDF-NGRAM-CHARS
+dataset_2,XGBClassifier,0.7015701570157016,TF-IDF-NGRAM-CHARS
+dataset_2,XGBClassifier,0.6028602860286029,Word Embeddings Wiki
+dataset_2,shallow neural network,0.4396106277294396,BAG-OF-WORDS-NGRAM
+dataset_2,CNN,0.4396106277294396,Word Embeddings
+dataset_2,RNN-LSTM,0.4396106277294396,Word Embeddings
+dataset_2,RNN-GRU,0.4396106277294396,Word Embeddings
+dataset_2,RNN-Bidirectional,0.4396106277294396,Word Embeddings
+dataset_2,RCNN,0.4396106277294396,Word Embeddings
