@@ -43,7 +43,7 @@ def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=Fa
         exp1= ExploringData(train,train_tweet,train_label)
         exp1.runall()
 
-    #################################PREPROCESSING START###########################################
+    #############################################PREPROCESSING START############################################
     train=dataclean.tweet_cleaner(train,train_tweet,preprocessoptions=[
         'noise','short_words','stop_words','rare_words','common_words','lemmatization','lower_case'])
 
@@ -107,10 +107,7 @@ def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=Fa
         if embedding_vector is not None:
             embedding_matrix[i] = embedding_vector
     # END OF PRETRAINED WORDEMBEDDING FEATURE
-
-
-
-    #################################PREPROCESSING END###########################################
+    #############################################PREPROCESSING END############################################
 
 
 
@@ -314,44 +311,26 @@ def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=Fa
     train_model(create_model_architecture(featureList[1].xtrain.shape[1]),"shallow neural network", featureList[1].name, featureList[1].xtrain, ytrain, featureList[1].xvalid,is_neural_net=True)
     ####################END OF TRAINING WITH SHALLOW NEURAL NETWORKS####################
 
+    #################################START OF DEEP LEARNING#####################################################
+    #################################Start of List of Deep Learning Classifiers#################################
+    class Classifier:
+        def __init__(self,clname, classifiermodel):
+            self.clname=clname
+            self.classifiermodel=classifiermodel
 
-    # START TRAINING WITH DEEP NEURAL NETWORKS
-    # model_name = 'CNN'
-    # feature_name = 'word2vec'
-    # classifier = create_cnn()
-    # accuracycnn = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracycnn, feature_name))
-    # print ("CNN, Word Embeddings", accuracycnn)
-    #
-    # model_name = "RNN-LSTM"
-    # feature_name = 'word2vec'
-    # classifier = create_rnn_lstm()
-    # accuracy_rnn = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracy_rnn, feature_name))
-    # print ("RNN-LSTM, Word Embeddings", accuracy_rnn)
-    #
-    # model_name="RNN-GRU"
-    # feature_name = 'word2vec'
-    # classifier = create_rnn_gru()
-    # accuracy_gru = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracy_gru, feature_name))
-    # print("RNN-GRU, Word Embeddings", accuracy_gru)
-    #
-    # model_name="RNN-Bidirectional"
-    # feature_name = 'word2vec'
-    # classifier = create_bidirectional_rnn()
-    # accuracy_birnn = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracy_birnn, feature_name))
-    # print("RNN-Bidirectional, Word Embeddings", accuracy_birnn)
-    #
-    # model_name="RCNN"
-    # feature_name = 'word2vec'
-    # classifier = create_rcnn()
-    # accuracy_rcnn = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracy_rcnn, feature_name))
-    # print("RCNN, Word Embeddings", accuracy_rcnn)
+    classifierList=[]
+    classifierList.append(Classifier('CNN',create_cnn()))
+    classifierList.append(Classifier('RNN-LSTM',create_rnn_lstm()))
+    classifierList.append(Classifier('RNN-GRU',create_rnn_gru()))
+    classifierList.append(Classifier('RNN-Bidirectional',create_bidirectional_rnn()))
+    classifierList.append(Classifier('RCNN',create_rcnn()))
+    #################################End of List of Deep Learning Classifiers####################################
 
-    # END TRAINING WITH DEEP NEURAL NETWORKS
+    ##########################Start of training with DEEP LEarning Models########################################
+    [train_model(classifier.classifiermodel,classifier.clname,"Word Embeddings",train_seq_x,ytrain,valid_seq_x,is_neural_net=True)for classifier in classifierList]
+    ##########################Start of training with DEEP LEarning Models########################################
+    ###################################END OF DEEP LEARNING######################################################
+
 
     cv_df = pd.DataFrame(entries,columns=['dataset','model_name', 'accuracy','feature'])
     # print(cv_df)
@@ -367,10 +346,11 @@ def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=Fa
 
 
 
-#Train(train_2,'dataset_2',"SentimentText","Sentiment",storemodel=True)
+
 
 start = time.time()
-Train(train_1,"dataset_1","tweet","label")
+#Train(train_1,"dataset_1","tweet","label")
+Train(train_2,'dataset_2',"SentimentText","Sentiment",storemodel=True)
 end = time.time()
 result=(end-start)/60
 print("time to train dataset_1 took: ",str(result)," minutes")
