@@ -27,7 +27,7 @@ tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-2, 1e-1, 1], 'C': [1, 10, 1
                     {'kernel': ['poly'], 'degree': [2, 3, 4], 'coef0': [0, 1], 'gamma': [1e-2, 1e-1, 1],
                      'C': [1, 10, 100]}]
 
-class grid_search_svm:
+class grid_search_svc:
     def __init__(self,train_x,train_y):
         # run rbf randomized search
         start = time()

@@ -83,7 +83,6 @@ class tweet_cleaner:
                   'lower_case': 'lower_case(dataset, tweetcolumn)'}
     def __new__(cls, dataset, tweetcolumn, preprocessoptions=False):
         """
-
         :param dataset: give it an DataFrame dataset
         :param tweetcolumn: the column you want to preprocess
         :param preprocessoptions: if not defined all cleaning options run automatically else if you define them you do it in following way
@@ -95,27 +94,7 @@ class tweet_cleaner:
         cls.tweetcolumn= tweetcolumn
         cls.preprocessoptions = preprocessoptions
 
-        if preprocessoptions:
-            for option in cls.preprocessoptions:
-                mycode = choiceList.get(option)
-                cls.dataset = exec(mycode)
-        else:
-            for choice in choiceList:
-                mycode= choiceList[choice]
-                cls.data = exec(mycode)
+        cls.dataset = [exec(choiceList.get(cls, option)) for option in cls.preprocessoptions if preprocessoptions]
+        cls.dataset = [exec(choiceList[choice]) for choice in choiceList if not preprocessoptions]
+
         return dataset
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

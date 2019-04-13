@@ -1,17 +1,19 @@
 # 
 # AUTHOR: KAMIL LIPSKI
 # 
-import gensim
+
 import pandas as pd
 import numpy as np
 import warnings
-from gensim.models import Word2Vec
+
+from keras_preprocessing import sequence, text
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
+from sklearn.svm import LinearSVC, SVC
 from xgboost import XGBClassifier
-from keras import layers, models as mdl, optimizers
+from keras import models as mdl
 from sklearn import metrics, preprocessing
 from classes.data_exploring import ExploringData
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -20,35 +22,20 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from classes import tweet_cleaner as dataclean
 from sklearn.externals import joblib
-from keras.preprocessing import text, sequence
-from keras import layers, models, optimizers
+from keras import layers, optimizers
 import time
-# resources:
-# https://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html
-# http://cmdlinetips.com/2018/11/string-manipulations-in-pandas/
-# w3schools.com/python
-# https://www.analyticsvidhya.com/blog/2017/06/word-embeddings-count-word2veec/
+from classes.features import FeatureClass
 
-train_1 = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
-test_1 = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
-train_2 = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
-test_2 = pd.read_csv("data/dataset_2/test.csv", delimiter=None, header='infer', names=None, index_col=None, encoding='latin-1')
-
-
-def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=False, storemodel=False):
+def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemodel=False):
+    start = time.time()
     # splitting data into training and validation set
     xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42,
                                                       test_size=0.3)
     if dataexplore:
         exp1= ExploringData(train,train_tweet,train_label)
         exp1.runall()
-
-    #################################PREPROCESSING START###########################################
-    train=dataclean.tweet_cleaner(train,train_tweet,preprocessoptions=[
-        'noise','short_words','stop_words','rare_words','common_words','lemmatization','lower_case'])
-
-
-
+    #############################################PREPROCESSING START############################################
+    train = dataclean.tweet_cleaner(train, train_tweet, preprocessoptions=['noise', 'short_words', 'stop_words', 'rare_words', 'common_words', 'lemmatization', 'lower_case'])
     # START OF COUNT VECTORS AS FEATURES
     # creates a count vectorizer object and transform the training and validation data using count vectorizer object
     count_vect = CountVectorizer(analyzer='word', token_pattern=r'\w{1,}')
@@ -64,13 +51,14 @@ def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=Fa
     xtrain_tfidf = tfidf_vect.transform(xtrain)
     xvalid_tfidf = tfidf_vect.transform(xvalid)
     # ngram level tf-idf
-    tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(1, 3), max_features=2500)
+    tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(1, 3),
+                                           max_features=2500)
     tfidf_vect_ngram.fit(train[train_tweet])
     xtrain_tfidf_ngram = tfidf_vect_ngram.transform(xtrain)
     xvalid_tfidf_ngram = tfidf_vect_ngram.transform(xvalid)
     # characters level tf-idf
     tfidf_vect_ngram_chars = TfidfVectorizer(analyzer='char', token_pattern=r'\w{1,}', ngram_range=(1, 3),
-                                             max_features=2500)
+                                                 max_features=2500)
     tfidf_vect_ngram_chars.fit(train[train_tweet])
     xtrain_tfidf_ngram_chars = tfidf_vect_ngram_chars.transform(xtrain)
     xvalid_tfidf_ngram_chars = tfidf_vect_ngram_chars.transform(xvalid)
@@ -108,9 +96,8 @@ def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=Fa
             embedding_matrix[i] = embedding_vector
     # END OF PRETRAINED WORDEMBEDDING FEATURE
 
+    #############################################PREPROCESSING END############################################
 
-
-    #################################PREPROCESSING END###########################################
 
 
 
@@ -299,78 +286,43 @@ def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=Fa
     featureList.append(Feature('TF-IDF-NGRAM-CHARS', xtrain_tfidf_ngram_chars, xvalid_tfidf_ngram_chars))
     featureList.append(Feature('TF-IDF-NGRAM-CHARS', xtrain_tfidf_ngram_chars, xvalid_tfidf_ngram_chars))
     featureList.append(Feature('Word Embeddings Wiki', train_seq_x, valid_seq_x))
-
     #################################End of List of Features##############################################
 
-
-
     ####################START TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS##########################
-    #models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier()]
+    models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier()]
     entries = []
-    [train_model(model,model.__class__.__name__, feature.name, feature.xtrain, ytrain, feature.xvalid)for model in models for feature in featureList ]
+    [train_model(model,model.__class__.__name__, feature.name, feature.xtrain, ytrain, feature.xvalid)for model in models for feature in featureList]
     #####################END TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS###########################
 
     #####################START OF TRAINING WITH SHALLOW NEURAL NETWORKS####################
     train_model(create_model_architecture(featureList[1].xtrain.shape[1]),"shallow neural network", featureList[1].name, featureList[1].xtrain, ytrain, featureList[1].xvalid,is_neural_net=True)
     ####################END OF TRAINING WITH SHALLOW NEURAL NETWORKS####################
 
-    # START TRAINING WITH DEEP NEURAL NETWORKS
-    # model_name = 'CNN'
-    # feature_name = 'word2vec'
-    # classifier = create_cnn()
-    # accuracycnn = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracycnn, feature_name))
-    # print ("CNN, Word Embeddings", accuracycnn)
-    #
-    # model_name = "RNN-LSTM"
-    # feature_name = 'word2vec'
-    # classifier = create_rnn_lstm()
-    # accuracy_rnn = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracy_rnn, feature_name))
-    # print ("RNN-LSTM, Word Embeddings", accuracy_rnn)
-    #
-    # model_name="RNN-GRU"
-    # feature_name = 'word2vec'
-    # classifier = create_rnn_gru()
-    # accuracy_gru = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracy_gru, feature_name))
-    # print("RNN-GRU, Word Embeddings", accuracy_gru)
-    #
-    # model_name="RNN-Bidirectional"
-    # feature_name = 'word2vec'
-    # classifier = create_bidirectional_rnn()
-    # accuracy_birnn = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracy_birnn, feature_name))
-    # print("RNN-Bidirectional, Word Embeddings", accuracy_birnn)
-    #
-    # model_name="RCNN"
-    # feature_name = 'word2vec'
-    # classifier = create_rcnn()
-    # accuracy_rcnn = train_model(classifier,model_name,feature_name, train_seq_x, ytrain, valid_seq_x, is_neural_net=True)
-    # entries.append((model_name, accuracy_rcnn, feature_name))
-    # print("RCNN, Word Embeddings", accuracy_rcnn)
+    #################################START OF DEEP LEARNING#####################################################
+    #################################Start of List of Deep Learning Classifiers#################################
+    class Classifier:
+        def __init__(self,clname, classifiermodel):
+            self.clname=clname
+            self.classifiermodel=classifiermodel
 
-    # END TRAINING WITH DEEP NEURAL NETWORKS
+    classifierList=[]
+    classifierList.append(Classifier('CNN',create_cnn()))
+    classifierList.append(Classifier('RNN-LSTM',create_rnn_lstm()))
+    classifierList.append(Classifier('RNN-GRU',create_rnn_gru()))
+    classifierList.append(Classifier('RNN-Bidirectional',create_bidirectional_rnn()))
+    classifierList.append(Classifier('RCNN',create_rcnn()))
+    #################################End of List of Deep Learning Classifiers####################################
+
+    ##########################Start of training with DEEP LEarning Models########################################
+    [train_model(classifier.classifiermodel,classifier.clname,"Word Embeddings",train_seq_x,ytrain,valid_seq_x,is_neural_net=True)for classifier in classifierList]
+    ##########################Start of training with DEEP LEarning Models########################################
+    ###################################END OF DEEP LEARNING######################################################
+
 
     cv_df = pd.DataFrame(entries,columns=['dataset','model_name', 'accuracy','feature'])
     # print(cv_df)
     cv_df.to_csv('data/results/accuracy_table/all_results_from_training.csv',mode='a', index_label=False, header=False, index=False)
 
-
-
-
-
-
-
-
-
-
-
-#Train(train_2,'dataset_2',"SentimentText","Sentiment",storemodel=True)
-
-start = time.time()
-Train(train_1,"dataset_1","tweet","label")
-end = time.time()
-result=(end-start)/60
-print("time to train dataset_1 took: ",str(result)," minutes")
-exit(0)
+    end = time.time()
+    result = (end - start) / 60
+    print("time to train "+datasetname+" took: ", str(result), " minutes")
