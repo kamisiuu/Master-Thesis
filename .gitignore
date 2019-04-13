@@ -2,5 +2,4 @@ venv/*
 .idea/*
 .vscode/*
 data/results/stored_trained_models/*
-data/GoogleNews-vectors-negative300.bin
-data/wiki-news-300d-1M.vec
+data/pretrained_vectors/*

@@ -1,6 +1,6 @@
-#
+# 
 # AUTHOR: KAMIL LIPSKI
-#
+# 
 import gensim
 import pandas as pd
 import numpy as np
@@ -305,15 +305,14 @@ def Train(train,datasetname,train_tweet,train_label, clean=False, dataexplore=Fa
 
 
     ####################START TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS##########################
-    models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier()]
+    #models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier()]
     entries = []
-    [train_model(model,model.__class__.__name__, feature.name, feature.xtrain, ytrain, feature.xvalid)for model in models for feature in featureList]
+    [train_model(model,model.__class__.__name__, feature.name, feature.xtrain, ytrain, feature.xvalid)for model in models for feature in featureList ]
     #####################END TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS###########################
 
     #####################START OF TRAINING WITH SHALLOW NEURAL NETWORKS####################
     train_model(create_model_architecture(featureList[1].xtrain.shape[1]),"shallow neural network", featureList[1].name, featureList[1].xtrain, ytrain, featureList[1].xvalid,is_neural_net=True)
     ####################END OF TRAINING WITH SHALLOW NEURAL NETWORKS####################
-
 
     # START TRAINING WITH DEEP NEURAL NETWORKS
     # model_name = 'CNN'

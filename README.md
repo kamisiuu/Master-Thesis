@@ -20,6 +20,7 @@
   <li>Recurrent Neural Network </li>  
   <li>Recurrent Neural Network – LSTM </li>
   <li>Recurrent Neural Network – GRU </li>
+  <li>Recurrent Neural Network - BIDIRECTIONAL</li>
  </ol>
 </div>
 <div>  
