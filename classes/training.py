@@ -301,7 +301,7 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     #################################End of List of Features##############################################
 
     ####################START TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS##########################
-    models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier()]
+    models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier]
     entries = []
     [train_model(model,model.__class__.__name__, feature.name, feature.xtrain, ytrain, feature.xvalid)for model in models for feature in featureList]
     #####################END TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS###########################
@@ -326,7 +326,7 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     #################################End of List of Deep Learning Classifiers####################################
 
     ##########################Start of training with DEEP LEarning Models########################################
-    [train_model(classifier.classifiermodel,classifier.clname,"Word Embeddings",train_seq_x,ytrain,valid_seq_x,is_neural_net=True)for classifier in classifierList]
+    [train_model(classifier.classifiermodel,classifier.clname,"Word Embeddings",train_seq_x,ytrain,valid_seq_x,is_neural_net=True) for classifier in classifierList]
     ##########################Start of training with DEEP LEarning Models########################################
     ###################################END OF DEEP LEARNING######################################################
 
