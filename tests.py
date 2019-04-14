@@ -7,7 +7,9 @@
 # from models.SVCgridSearch import paramTunSVC
 # from classes.data_exploring import ExploringData
 # from classes.data_upload import Upload
-# train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
+import pandas as pd
+from classes.tweet_cleaner import tweet_cleaner
+train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
 # #test = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
 #
 # from classes.tweet_cleaner import tweet_cleaner
@@ -21,15 +23,20 @@
 #
 #
 #
-# data = tweet_cleaner(train,'tweet')
-# print(data)
-# START TRAINING WITH DEEP NEURAL NETWORKS
-classifierList = {'CNN': 'create_cnn()', 'RCNN': 'create_rcnn()', 'RNN-LSTM': 'create_rnn_lstm()',
-                  'RNN-GRU': 'create_rnn_gru()', 'BIDIRECTIONAL-RNN': 'create_bidirectional_rnn()'}
 
-for choicemodel in classifierList:
-    #print (choicemodel)
-    print( classifierList[choicemodel])
+
+data = tweet_cleaner(train,'tweet',preprocessoptions=['noise','short_words','stop_words','rare_words','common_words','stemming','lemmatization','lower_case'])
+print(data)
+
+
+
+# START TRAINING WITH DEEP NEURAL NETWORKS
+# classifierList = {'CNN': 'create_cnn()', 'RCNN': 'create_rcnn()', 'RNN-LSTM': 'create_rnn_lstm()',
+#                   'RNN-GRU': 'create_rnn_gru()', 'BIDIRECTIONAL-RNN': 'create_bidirectional_rnn()'}
+#
+# for choicemodel in classifierList:
+#     #print (choicemodel)
+#     print( classifierList[choicemodel])
 # from classes.grid_search_utility import grid_search_svm
 # import gensim
 # from gensim.models import Word2Vec

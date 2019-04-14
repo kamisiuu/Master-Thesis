@@ -93,8 +93,14 @@ class tweet_cleaner:
         cls.dataset = dataset
         cls.tweetcolumn= tweetcolumn
         cls.preprocessoptions = preprocessoptions
-
-        cls.dataset = [exec(choiceList.get(cls, option)) for option in cls.preprocessoptions if preprocessoptions]
-        cls.dataset = [exec(choiceList[choice]) for choice in choiceList if not preprocessoptions]
+        if preprocessoptions:
+            for option in cls.preprocessoptions:
+                mycode = choiceList.get(option)
+                cls.dataset = exec(mycode)
+        else:
+            for choice in choiceList:
+                mycode= choiceList[choice]
+                cls.dataset = exec(mycode)
 
         return dataset
+
