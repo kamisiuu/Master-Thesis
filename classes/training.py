@@ -1,6 +1,6 @@
-# 
+#
 # AUTHOR: KAMIL LIPSKI
-# 
+#
 
 import pandas as pd
 import numpy as np
@@ -24,20 +24,20 @@ from classes import tweet_cleaner as dataclean
 from sklearn.externals import joblib
 from keras import layers, optimizers
 import time
-from classes.features import FeatureClass
+
 
 def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemodel=False):
     start = time.time()
-    # splitting data into training and validation set
-    xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42,
-                                                      test_size=0.3)
+
     if dataexplore:
         exp1= ExploringData(train,train_tweet,train_label)
         exp1.runall()
     #############################################PREPROCESSING START############################################
     train = dataclean.tweet_cleaner(train, train_tweet, preprocessoptions=['noise', 'short_words', 'stop_words', 'rare_words', 'common_words', 'lemmatization', 'lower_case'])
+    # splitting data into training and validation set
+    xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42,
+                                                      test_size=0.3)
     # START OF COUNT VECTORS AS FEATURES
-    # creates a count vectorizer object and transform the training and validation data using count vectorizer object
     count_vect = CountVectorizer(analyzer='word', token_pattern=r'\w{1,}')
     count_vect.fit(train[train_tweet])
     xtrain_count = count_vect.transform(xtrain)
@@ -52,13 +52,13 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     xvalid_tfidf = tfidf_vect.transform(xvalid)
     # ngram level tf-idf
     tfidf_vect_ngram = TfidfVectorizer(analyzer='word', token_pattern=r'\w{1,}', ngram_range=(1, 3),
-                                           max_features=2500)
+                                       max_features=2500)
     tfidf_vect_ngram.fit(train[train_tweet])
     xtrain_tfidf_ngram = tfidf_vect_ngram.transform(xtrain)
     xvalid_tfidf_ngram = tfidf_vect_ngram.transform(xvalid)
     # characters level tf-idf
     tfidf_vect_ngram_chars = TfidfVectorizer(analyzer='char', token_pattern=r'\w{1,}', ngram_range=(1, 3),
-                                                 max_features=2500)
+                                             max_features=2500)
     tfidf_vect_ngram_chars.fit(train[train_tweet])
     xtrain_tfidf_ngram_chars = tfidf_vect_ngram_chars.transform(xtrain)
     xvalid_tfidf_ngram_chars = tfidf_vect_ngram_chars.transform(xvalid)
@@ -78,7 +78,8 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     for i, line in enumerate(open('data/pretrained_vectors/wiki-news-300d-1M.vec')):
         values = line.split()
         embeddings_index[values[0]] = np.asarray(values[1:], dtype='float32')
-
+    vector_dataset = open('data/pretrained_vectors/wiki-news-300d-1M.vec')
+    [() for line in vector_dataset]
     # create a tokenizer
     token = text.Tokenizer()
     token.fit_on_texts(train[train_tweet])
@@ -90,18 +91,30 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
 
     # create token-embedding mapping
     embedding_matrix = np.zeros((len(word_index) + 1, 300))
+
     for word, i in word_index.items():
         embedding_vector = embeddings_index.get(word)
         if embedding_vector is not None:
             embedding_matrix[i] = embedding_vector
+
     # END OF PRETRAINED WORDEMBEDDING FEATURE
+    #################################Start of List of Features############################################
+    # This class helps further in
+    class Feature:
+        def __init__(self, name, xtrain=[], xvalid=[]):
+            self.name = name
+            self.xtrain = xtrain
+            self.xvalid = xvalid
 
+    featureList = []
+    featureList.append(Feature('BAG-OF-WORDS', xtrain_count, xvalid_count))
+    featureList.append(Feature('BAG-OF-WORDS-NGRAM', xtrain_bow, xvalid_bow))
+    featureList.append(Feature('TF-IDF-WORD', xtrain_tfidf, xvalid_tfidf))
+    featureList.append(Feature('TF-IDF-NGRAM-WORD', xtrain_tfidf_ngram, xvalid_tfidf_ngram))
+    featureList.append(Feature('TF-IDF-NGRAM-CHARS', xtrain_tfidf_ngram_chars, xvalid_tfidf_ngram_chars))
+    featureList.append(Feature('TF-IDF-NGRAM-CHARS', xtrain_tfidf_ngram_chars, xvalid_tfidf_ngram_chars))
+    featureList.append(Feature('Word Embeddings Wiki', train_seq_x, valid_seq_x))
     #############################################PREPROCESSING END############################################
-
-
-
-
-
 
     def train_model(classifier, model_name, feature_name, feature_vector_train, label, feature_vector_valid, is_neural_net=False):
         # fit the training dataset on the classifier
@@ -277,7 +290,6 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
             self.name = name
             self.xtrain = xtrain
             self.xvalid = xvalid
-
     featureList = []
     featureList.append(Feature('BAG-OF-WORDS', xtrain_count, xvalid_count))
     featureList.append(Feature('BAG-OF-WORDS-NGRAM', xtrain_bow, xvalid_bow))
