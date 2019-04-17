@@ -1,20 +1,18 @@
 #
 # AUTHOR: KAMIL LIPSKI
 #
-
+# IMPORTS
 import pandas as pd
 import numpy as np
 import warnings
-
 from keras_preprocessing import sequence, text
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
-from sklearn.svm import LinearSVC, SVC
 from xgboost import XGBClassifier
 from keras import models as mdl
-from sklearn import metrics, preprocessing
+from sklearn import metrics
 from classes.data_exploring import ExploringData
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from sklearn.naive_bayes import MultinomialNB
@@ -24,7 +22,7 @@ from classes import tweet_cleaner as dataclean
 from sklearn.externals import joblib
 from keras import layers, optimizers
 import time
-
+# IMPORTS
 
 def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemodel=False):
     start = time.time()
@@ -141,7 +139,9 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
 
             if is_neural_net:
                 predictions = predictions.argmax(axis=-1)
-            entries.append((datasetname, model_name, metrics.accuracy_score(predictions, yvalid), feature_name))
+            accuracy=metrics.accuracy_score(predictions, yvalid)
+            print(datasetname,model_name,accuracy)
+            entries.append((datasetname, model_name,accuracy, feature_name))
             return metrics.accuracy_score(predictions, yvalid)
 
 
@@ -301,7 +301,7 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     #################################End of List of Features##############################################
 
     ####################START TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS##########################
-    models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier]
+    models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier()]
     entries = []
     [train_model(model,model.__class__.__name__, feature.name, feature.xtrain, ytrain, feature.xvalid)for model in models for feature in featureList]
     #####################END TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS###########################
@@ -326,7 +326,7 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     #################################End of List of Deep Learning Classifiers####################################
 
     ##########################Start of training with DEEP LEarning Models########################################
-    [train_model(classifier.classifiermodel,classifier.clname,"Word Embeddings",train_seq_x,ytrain,valid_seq_x,is_neural_net=True) for classifier in classifierList]
+    [train_model(classifier.classifiermodel,classifier.clname,"Word Embeddings",train_seq_x,ytrain,valid_seq_x,is_neural_net=True)for classifier in classifierList]
     ##########################Start of training with DEEP LEarning Models########################################
     ###################################END OF DEEP LEARNING######################################################
 
