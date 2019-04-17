@@ -8,8 +8,39 @@
 # from classes.data_exploring import ExploringData
 # from classes.data_upload import Upload
 import pandas as pd
+from sklearn import metrics
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import SGDClassifier
+from sklearn.metrics import f1_score, classification_report
+from sklearn.model_selection import train_test_split, cross_val_score
+
 from classes.tweet_cleaner import tweet_cleaner
-train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
+train = pd.read_csv("data/dataset_2/train.csv", header='infer', index_col=None)
+
+xtrain,xvalid,ytrain,yvalid = train_test_split(train['SentimentText'],train['Sentiment'],test_size=0.3)
+
+count_vect= CountVectorizer()
+count_vect.fit(train['SentimentText'])
+xtrain_count = count_vect.transform(xtrain)
+xvalid_count= count_vect.transform(xvalid)
+
+classifier = SGDClassifier()
+classifier.fit(xtrain_count,ytrain)
+
+prediction=classifier.predict(xvalid_count)
+#accuracy = classification_report(prediction,yvalid)
+accuracy = metrics.accuracy_score(prediction,yvalid)
+
+print(accuracy)
+entries=[]
+accuracies = cross_val_score(classifier, xtrain_count, ytrain, scoring='accuracy', cv=100)
+print(accuracies)
+for fold_idx, accuracy in enumerate(accuracies):
+    entries.append((classifier.__class__.__name__, fold_idx, accuracy))
+cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
+print(cv_df.groupby('model_name').accuracy.mean())
+
+
 # #test = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
 #
 # from classes.tweet_cleaner import tweet_cleaner
@@ -24,9 +55,6 @@ train = pd.read_csv("data/dataset_1/train.csv", header='infer', index_col=None)
 #
 #
 
-
-data = tweet_cleaner(train,'tweet',preprocessoptions=['noise','short_words','stop_words','rare_words','common_words','stemming','lemmatization','lower_case'])
-print(data)
 
 
 

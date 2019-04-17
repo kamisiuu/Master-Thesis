@@ -12,7 +12,8 @@
 numpy
 pandas
 py-xgboost-gpu
-xgboost
+#xgboost
+py-xgboost-gpu
 scikit-learn
 tensorflow-gpu
 tensorflow
