@@ -1,0 +1,22 @@
+name: Master-Thesis
+env_specs:
+  default:
+    packages:
+    - pip:
+      - numpy
+      - pandas
+      - py-xgboost-gpu
+      - py-xgboost-gpu
+      - scikit-learn
+      - tensorflow-gpu
+      - tensorflow
+      - keras
+      - matplotlib
+      - nltk
+      - wordcloud
+      - seaborn
+      - tabulate
+      - textblob
+      - gensim
+      - paramiko
+    channels: []
