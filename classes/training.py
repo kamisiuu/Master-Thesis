@@ -5,14 +5,16 @@
 import pandas as pd
 import numpy as np
 import warnings
+
+from keras.layers import LSTM, Dense, Bidirectional
 from keras_preprocessing import sequence, text
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 from xgboost import XGBClassifier
-from keras import models as mdl
-from sklearn import metrics
+from keras import models as mdl, Sequential
+from sklearn import metrics, preprocessing
 from classes.data_exploring import ExploringData
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 from sklearn.naive_bayes import MultinomialNB
@@ -20,7 +22,9 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from classes import tweet_cleaner as dataclean
 from sklearn.externals import joblib
-from keras import layers, optimizers
+from keras import optimizers
+from keras.models import Sequential
+from keras import layers
 import time
 # IMPORTS
 
@@ -31,10 +35,14 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
         exp1= ExploringData(train,train_tweet,train_label)
         exp1.runall()
     #############################################PREPROCESSING START############################################
-    train = dataclean.tweet_cleaner(train, train_tweet, preprocessoptions=['noise', 'short_words', 'stop_words', 'rare_words', 'common_words', 'lemmatization', 'lower_case'])
+    train = dataclean.tweet_cleaner(train, train_tweet, preprocessoptions=['noise', 'short_words', 'stop_words', 'rare_words', 'common_words', 'tokenization', 'lower_case'])
     # splitting data into training and validation set
-    xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42,
-                                                      test_size=0.3)
+    xtrain, xvalid, ytrain, yvalid = train_test_split(train[train_tweet], train[train_label], random_state=42,test_size=0.3)
+
+    # label encode the target variable
+    encoder = preprocessing.LabelEncoder()
+    ytrain = encoder.fit_transform(ytrain)
+    yvalid = encoder.fit_transform(yvalid)
     # START OF COUNT VECTORS AS FEATURES
     count_vect = CountVectorizer(analyzer='word', token_pattern=r'\w{1,}')
     count_vect.fit(train[train_tweet])
@@ -96,7 +104,7 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
             embedding_matrix[i] = embedding_vector
 
     # END OF PRETRAINED WORDEMBEDDING FEATURE
-    #################################Start of List of Features############################################
+    #---------------------------------Start of List of Features---------------------------------------------------#
     # This class helps further in
     class Feature:
         def __init__(self, name, xtrain=[], xvalid=[]):
@@ -112,7 +120,7 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     featureList.append(Feature('TF-IDF-NGRAM-CHARS', xtrain_tfidf_ngram_chars, xvalid_tfidf_ngram_chars))
     featureList.append(Feature('TF-IDF-NGRAM-CHARS', xtrain_tfidf_ngram_chars, xvalid_tfidf_ngram_chars))
     featureList.append(Feature('Word Embeddings Wiki', train_seq_x, valid_seq_x))
-    #############################################PREPROCESSING END############################################
+    #------------------------------------------PREPROCESSING END-------------------------------------------------#
 
     def train_model(classifier, model_name, feature_name, feature_vector_train, label, feature_vector_valid, is_neural_net=False):
         # fit the training dataset on the classifier
@@ -282,8 +290,17 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
         model = mdl.Model(inputs=input_layer, outputs=output_layer2)
         model.compile(optimizer=optimizers.Adam(), loss='binary_crossentropy')
         return model
-
-    #################################Start of List of Features############################################
+    def create_keras():
+        input_dim=xtrain.shape[1]
+        model=Sequential()
+        model.add(layers.Dense(10, input_dim=input_dim, activation='relu'))
+        model.add(layers.Dense(1, activation='sigmoid'))
+        model.compile(loss='binary_crossentropy',
+                      optimizer='adam',
+                      metrics=['accuracy'])
+        model.summary()
+        return model
+    #----------------------------------Start of List of Features-------------------------------------------------#
     # This class helps further in
     class Feature:
         def __init__(self, name, xtrain=[], xvalid=[]):
@@ -297,38 +314,40 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     featureList.append(Feature('TF-IDF-NGRAM-WORD', xtrain_tfidf_ngram, xvalid_tfidf_ngram))
     featureList.append(Feature('TF-IDF-NGRAM-CHARS', xtrain_tfidf_ngram_chars, xvalid_tfidf_ngram_chars))
     featureList.append(Feature('TF-IDF-NGRAM-CHARS', xtrain_tfidf_ngram_chars, xvalid_tfidf_ngram_chars))
-    featureList.append(Feature('Word Embeddings Wiki', train_seq_x, valid_seq_x))
-    #################################End of List of Features##############################################
+    #featureList.append(Feature('Word Embeddings Wiki', train_seq_x, valid_seq_x))
+    #-----------------------------------------End of List of Features---------------------------------------------#
 
-    ####################START TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS##########################
-    models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier()]
+    #-------------------START TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS----------------------------------#
+    # models = [MultinomialNB(),LogisticRegression(),SGDClassifier(),KNeighborsClassifier(),RandomForestClassifier(),XGBClassifier(),MLPClassifier()]
     entries = []
-    [train_model(model,model.__class__.__name__, feature.name, feature.xtrain, ytrain, feature.xvalid)for model in models for feature in featureList]
-    #####################END TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS###########################
+    # [train_model(model,model.__class__.__name__, feature.name, feature.xtrain, ytrain, feature.xvalid)for model in models for feature in featureList]
+    #------------------------------END TRAINING WITH TRADITIONAL MACHINE LEARNING METHODS-------------------------#
 
-    #####################START OF TRAINING WITH SHALLOW NEURAL NETWORKS####################
+    #--------------------START OF TRAINING WITH SHALLOW NEURAL NETWORKS-------------------------------------------#
     train_model(create_model_architecture(featureList[1].xtrain.shape[1]),"shallow neural network", featureList[1].name, featureList[1].xtrain, ytrain, featureList[1].xvalid,is_neural_net=True)
     ####################END OF TRAINING WITH SHALLOW NEURAL NETWORKS####################
 
-    #################################START OF DEEP LEARNING#####################################################
-    #################################Start of List of Deep Learning Classifiers#################################
+    #-----------------------------------START OF DEEP LEARNING----------------------------------------------------#
+    #-----------------------------------Start of List of Deep Learning Classifiers--------------------------------#
     class Classifier:
         def __init__(self,clname, classifiermodel):
             self.clname=clname
             self.classifiermodel=classifiermodel
 
     classifierList=[]
-    classifierList.append(Classifier('CNN',create_cnn()))
-    classifierList.append(Classifier('RNN-LSTM',create_rnn_lstm()))
-    classifierList.append(Classifier('RNN-GRU',create_rnn_gru()))
-    classifierList.append(Classifier('RNN-Bidirectional',create_bidirectional_rnn()))
-    classifierList.append(Classifier('RCNN',create_rcnn()))
-    #################################End of List of Deep Learning Classifiers####################################
+    classifierList.append(Classifier('Keras',create_keras()))
+    # classifierList.append(Classifier('CNN',create_cnn()))
+    # classifierList.append(Classifier('RNN-LSTM',create_rnn_lstm()))
+    # classifierList.append(Classifier('RNN-GRU',create_rnn_gru()))
+    # classifierList.append(Classifier('RNN-Bidirectional',create_bidirectional_rnn()))
+    # classifierList.append(Classifier('RCNN',create_rcnn()))
+    #---------------------------------End of List of Deep Learning Classifiers-------------------------------------#
 
-    ##########################Start of training with DEEP LEarning Models########################################
+    #-------------------------Start of training with DEEP LEarning Models------------------------------------------#
     [train_model(classifier.classifiermodel,classifier.clname,"Word Embeddings",train_seq_x,ytrain,valid_seq_x,is_neural_net=True)for classifier in classifierList]
-    ##########################Start of training with DEEP LEarning Models########################################
-    ###################################END OF DEEP LEARNING######################################################
+    #-------------------------End of training with Deep Learning Models--------------------------------------------#
+
+    #--------------------------------------END OF DEEP LEARNING----------------------------------------------------#
 
 
     cv_df = pd.DataFrame(entries,columns=['dataset','model_name', 'accuracy','feature'])
