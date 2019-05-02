@@ -16,7 +16,7 @@ test_1 = pd.read_csv("data/dataset_1/test.csv", header='infer', index_col=None)
 train_2 = pd.read_csv("data/dataset_2/train.csv", header='infer',index_col=None)
 test_2 = pd.read_csv("data/dataset_2/test.csv", delimiter=None, header='infer', names=None, index_col=None, encoding='latin-1')
 
-Train(train_1,"dataset_1","tweet","label")
-#Train(train_2,'dataset_2',"SentimentText","Sentiment")
+#Train(train_1,"dataset_1","tweet","label")
+Train(train_2,'dataset_2',"SentimentText","Sentiment")
 
 exit(0)

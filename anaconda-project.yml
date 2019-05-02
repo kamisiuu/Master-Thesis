@@ -20,4 +20,5 @@ env_specs:
       - gensim
       - paramiko
       - keras-gpu
+      - keras
     channels: []

@@ -1,17 +1,14 @@
-import itertools
-import os
-import matplotlib.pyplot as plt
+
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 
-from sklearn.preprocessing import LabelBinarizer, LabelEncoder
-from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import LabelEncoder
 
-from tensorflow import keras
+
+
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Dropout
-from keras.preprocessing import text, sequence
+from keras.preprocessing import text
 from keras import utils
 
 #https://towardsdatascience.com/multi-class-text-classification-model-comparison-and-selection-5eb066197568

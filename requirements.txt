@@ -20,9 +20,7 @@ tensorflow
 keras
 matplotlib
 nltk
-wordcloud
 seaborn
 tabulate
-textblob
 gensim
 paramiko
