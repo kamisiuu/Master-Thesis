@@ -22,6 +22,11 @@ from keras import models as mlp
 from classes.data_exploring import ExploringData
 from classes import tweet_cleaner as dataclean
 
+from sklearn.preprocessing import LabelEncoder
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Dropout
+from keras.preprocessing import text
+from keras import utils
 from keras.models import Sequential
 from keras import layers, optimizers, Model
 import time
@@ -46,7 +51,9 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
     encoder = preprocessing.LabelEncoder()
     y_train = encoder.fit_transform(y_train)
     y_test = encoder.fit_transform(y_test)
-
+    num_classes = np.max(y_train) + 1
+    y_train = utils.to_categorical(y_train, num_classes)
+    y_test = utils.to_categorical(y_test, num_classes)
     # >>> COUNT VECTORIZER >>>
     count_vect = CountVectorizer(analyzer='word', token_pattern=r'\w{1,}')
     count_vect.fit(train[train_tweet])
@@ -122,20 +129,17 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
             entries.append((datasetname, model_name,accuracy, feature_name))
             return metrics.accuracy_score(predictions, y_test)
 
-    def create_lstm():
-        from sklearn.preprocessing import LabelEncoder
 
-        from keras.models import Sequential
-        from keras.layers import Dense, Activation, Dropout
-        from keras.preprocessing import text
-        from keras import utils
+    def neural_network():
+
         batch_size = 32
         epochs = 2
         max_words = 1000
-        num_classes = np.max(y_train) + 1
+
         # Build the model
         model = Sequential()
-        model.add(Dense(512, input_shape=(max_words,)))
+        input_dim= xtrain_count.shape[1]
+        model.add(Dense(512, input_dim=input_dim))
         model.add(Activation('relu'))
         model.add(Dropout(0.5))
         model.add(Dense(num_classes))
@@ -145,22 +149,18 @@ def Train(train,datasetname,train_tweet,train_label, dataexplore=False, storemod
                       optimizer='adam',
                       metrics=['accuracy'])
 
-        history = model.fit(xtrain_bow, y_train,
+        history = model.fit(xtrain_count, y_train,
                             batch_size=batch_size,
                             epochs=epochs,
-                            verbose=1,
-                            validation_split=0.1)
-        score = model.evaluate(xvalid_bow, y_test,
+                            verbose=1
+                            )
+        score = model.evaluate(xvalid_count, y_test,
                                batch_size=batch_size, verbose=1)
         print('Test accuracy:', score[1])
         return model
 
-        loss, accuracy = model.evaluate(xtrain_bow, ytrain, verbose=False)
-        print("Training Accuracy: {:.4f}".format(accuracy))
-        loss, accuracy = model.evaluate(xvalid_bow, yvalid, verbose=False)
-        print("Testing Accuracy:  {:.4f}".format(accuracy))
 
-
+    neural_network()
 
 
 
