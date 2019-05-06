@@ -11,11 +11,8 @@
 #
 numpy
 pandas
-py-xgboost-gpu
-#xgboost
-py-xgboost-gpu
+xgboost
 scikit-learn
-tensorflow-gpu
 tensorflow
 keras
 matplotlib
@@ -24,3 +21,5 @@ seaborn
 tabulate
 gensim
 paramiko
+wordcloud
+textblob

@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import nltk
-nltk.download('wordnet')
 from nltk.corpus import stopwords
 nltk.download('stopwords')
 from nltk.stem.porter import *
@@ -28,7 +27,6 @@ def short_words(dataset, tweetcolumn):
 def stop_words(dataset, tweetcolumn):
     stop = stopwords.words('english')
     dataset[tweetcolumn] = dataset[tweetcolumn].apply(lambda x: " ".join(x for x in x.split() if x not in stop))
-    print("stop words")
     return dataset
 
 
