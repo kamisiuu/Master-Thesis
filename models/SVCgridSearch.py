@@ -1,5 +1,6 @@
 
 from sklearn import datasets
+from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
@@ -25,7 +26,7 @@ class paramTunSVC:
             print("# Tuning hyper-parameters for %s" % score)
             print()
 
-            clf = GridSearchCV(SVC(), tuned_parameters, cv=5,
+            clf = GridSearchCV(SGDClassifier(), tuned_parameters, cv=5,
                                scoring='%s_macro' % score)
             clf.fit(X_train, y_train)
 

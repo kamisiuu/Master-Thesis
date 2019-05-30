@@ -16,12 +16,8 @@
   <li>Xtreme Gradient Boost </li>  
   <li>Shallow Neural Network </li>
   <li>Multilayer Perceptron Network </li>    
-  <li>Convolutional Neural Network </li>   
-  <li>Recurrent Neural Network </li>  
-  <li>Recurrent Neural Network – LSTM </li>
-  <li>Recurrent Neural Network – GRU </li>
-  <li>Recurrent Neural Network - BIDIRECTIONAL</li>
- </ol>
+  <li>Convolutional Neural Network </li>
+</ol>
 </div>
 <div>  
 <h3>TESTED ON FOLLOWING DATASETS:</h3>
@@ -34,9 +30,18 @@
   <li>Twitter sentiment analysis - Sentiment Classification. The dataset was retried from competition on Kaggle and taken from the real task 
   of text processing. The training data contains 100 000 labeled sentences with positive or negative sentiment. The test data contains 
   300k unlabeled sentences, URL: https://www.kaggle.com/c/twitter-sentiment-analysis2/data. </li>
+  
+  <li>kaggle</li>
+  <li>kaggle</li>
 </ol>
 </div>
-
+<div>
+<h3>Hyperparameter Tuning </h3>
+<ol>
+    <li>On SVC</li>
+<li>On Deep Learning</li>
+</ol>
+</div>
 <div>
 <h3>COMPARING DIFFERENT DATA TRANSFORMATION FEATURES</h3>
 <ol>
@@ -45,7 +50,6 @@
     <li>TF-IDF</li>
     <li>TF-IDF-Ngram-words</li>
     <li>TF-IFD-Ngram-chars</li>
-    <li>Word2Vec</li>
 </ol>
 </div>
 <div>
